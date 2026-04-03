@@ -25,7 +25,7 @@ export interface FilterGroup {
 export interface SortOption {
   value: string            // URL param value
   label: string            // display label
-  wcOrderby?: "menu_order" | "popularity" | "rating" | "date" | "price" | "modified"
+  wcOrderby?: "menu_order" | "popularity" | "rating" | "date" | "price"
   wcOrder?: "asc" | "desc"
 }
 
