@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat .next/dev/lock/*)",
+      "Bash(rm -f .next/dev/lock)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
