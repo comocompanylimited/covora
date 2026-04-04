@@ -35,7 +35,7 @@ export default function SplitLanding() {
           heading="Men"
           subheading="Refined. Confident. Defined."
           cta="Enter Mens"
-          videoSrc="/videos/men.mp4"
+          videoSrc="https://pub-98b9c2a87ab54dd9924de5af1f2e080e.r2.dev/mens.mp4"
         />
         <Panel
           side="womens"
@@ -47,7 +47,7 @@ export default function SplitLanding() {
           heading="Women"
           subheading="Elegant. Bold. Timeless."
           cta="Enter Womens"
-          videoSrc="/videos/women.mp4"
+          videoSrc="https://pub-98b9c2a87ab54dd9924de5af1f2e080e.r2.dev/womens.mp4"
         />
       </div>
 
