@@ -28,38 +28,50 @@ export async function fetchMensProducts(): Promise<GqlProductNode[]> {
     return []
   }
 
-  const res = await fetch(GQL_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      query: `{
-        products(first: 12) {
-          nodes {
-            id
-            databaseId
-            name
-            slug
-            image {
-              sourceUrl
-            }
-            ... on SimpleProduct {
-              price
-              regularPrice
-              salePrice
+  let res: Response
+  try {
+    res = await fetch(GQL_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: `{
+          products(first: 12) {
+            nodes {
+              id
+              databaseId
+              name
+              slug
+              image {
+                sourceUrl
+              }
+              ... on SimpleProduct {
+                price
+                regularPrice
+                salePrice
+              }
             }
           }
-        }
-      }`,
-    }),
-    next: { revalidate: 60 },
-  })
+        }`,
+      }),
+      next: { revalidate: 60 },
+    })
+  } catch (err) {
+    console.error("GraphQL network error:", err)
+    return []
+  }
 
   if (!res.ok) {
     console.error("GraphQL fetch failed:", res.status)
     return []
   }
 
-  const json: GqlResponse = await res.json()
+  let json: GqlResponse
+  try {
+    json = await res.json()
+  } catch (err) {
+    console.error("GraphQL JSON parse error:", err)
+    return []
+  }
 
   if (json.errors?.length) {
     console.error("GraphQL errors:", json.errors)
