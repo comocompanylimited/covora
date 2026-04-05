@@ -5,6 +5,8 @@ import MensHeader from "@/components/mens/MensHeader";
 import MensEditorialSection from "@/components/mens/MensEditorialSection";
 import { fetchMensProducts } from "@/lib/graphql/products";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Mens — Covora",
   description:
