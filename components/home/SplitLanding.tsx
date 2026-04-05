@@ -233,7 +233,7 @@ function Panel({
           muted
           loop
           playsInline
-          preload="metadata"
+          preload="auto"
           style={{
             opacity: mounted ? 1 : 0,
             transform: isHovered ? "scale(1.03)" : "scale(1)",
