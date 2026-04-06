@@ -35,11 +35,11 @@ export default async function WomensPage() {
           muted
           loop
           playsInline
-          preload="auto"
+          preload="metadata"
           aria-hidden
         />
 
-        {/* Overlay */}
+        {/* Overlay — 76% black, bottom-weighted for depth */}
         <div
           className="absolute inset-0"
           aria-hidden
@@ -48,7 +48,7 @@ export default async function WomensPage() {
           }}
         />
 
-        {/* Content */}
+        {/* Content — pushed slightly below centre for visual weight */}
         <div className="relative z-10 text-center px-6 select-none flex flex-col items-center" style={{ marginTop: "6vh" }}>
 
           {/* Eyebrow rule */}
@@ -78,7 +78,7 @@ export default async function WomensPage() {
           >
             Covora
             <br />
-            <span style={{ fontStyle: "italic", opacity: 0.9 }}>Femme</span>
+            <span style={{ fontStyle: "italic", opacity: 0.9 }}>Womens</span>
           </h1>
 
           {/* Divider */}
@@ -91,7 +91,7 @@ export default async function WomensPage() {
             }}
           />
 
-          {/* Sub-branding */}
+          {/* Sub-branding — Covora Lumière */}
           <div className="flex flex-col items-center gap-2">
             <span
               style={{
