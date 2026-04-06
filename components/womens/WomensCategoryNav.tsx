@@ -32,7 +32,7 @@ function CategoryBar() {
   return (
     <div onMouseLeave={leave}>
       {/* ── Category row ───────────────────────────────────────── */}
-      <div className="border-y border-[var(--border-dark)]">
+      <div style={{ borderTop: "1px solid rgba(201,169,110,0.3)", borderBottom: "1px solid rgba(201,169,110,0.3)" }}>
         <div className="px-6 lg:px-10">
           <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             <div
@@ -53,8 +53,8 @@ function CategoryBar() {
                     onClick={() => toggle(group.id)}
                     className="relative py-[1.1rem] text-center transition-colors duration-200"
                     style={{
-                      color: isActive ? "#ffffff" : "#C9A96E",
-                      borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.07)",
+                      color: isActive ? "#ffffff" : "rgba(255,255,255,0.7)",
+                      borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.25)",
                     }}
                   >
                     <span
@@ -95,12 +95,17 @@ function CategoryBar() {
           opacity: activeId ? 1 : 0,
           transition: "max-height 0.28s var(--ease-out-expo), opacity 0.2s ease",
           background: "#050504",
-          borderBottom: activeId ? "1px solid rgba(201,169,110,0.08)" : "none",
+          borderBottom: activeId ? "1px solid rgba(201,169,110,0.25)" : "none",
         }}
       >
         {active && (
           <div className="px-6 lg:px-10 py-7">
-            <div className="flex items-center gap-5 mb-5 pb-5 border-b border-[var(--border-dark)]">
+
+            {/* Panel header */}
+            <div
+              className="flex items-center gap-5 mb-5 pb-5"
+              style={{ borderBottom: "1px solid rgba(201,169,110,0.2)" }}
+            >
               <span
                 className="font-display text-[var(--ivory)]"
                 style={{ fontSize: "clamp(0.95rem, 1.3vw, 1.1rem)", fontWeight: 300, letterSpacing: "0.01em" }}
@@ -140,21 +145,21 @@ function CategoryBar() {
                 <Link
                   key={item.slug}
                   href={`/womens/category/${item.slug}`}
-                  className="group flex items-center gap-3 py-[0.7rem] pr-4 border-b border-[var(--border-dark)] hover:border-[rgba(201,169,110,0.18)] transition-all duration-200"
+                  className="group flex items-center gap-3 py-[0.7rem] pr-4 border-b border-[rgba(201,169,110,0.15)] hover:border-[rgba(201,169,110,0.35)] transition-all duration-200"
                 >
                   <span
                     className="label-caps tabular-nums flex-shrink-0 group-hover:text-[var(--gold)] transition-colors duration-200"
-                    style={{ fontSize: "0.37rem", letterSpacing: "0.1em", color: "var(--warm-grey-dark)", minWidth: "1.1rem", textAlign: "right" }}
+                    style={{ fontSize: "0.37rem", letterSpacing: "0.1em", color: "rgba(201,169,110,0.5)", minWidth: "1.1rem", textAlign: "right" }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span
                     className="flex-shrink-0 block group-hover:opacity-40 transition-opacity duration-200"
-                    style={{ width: "1px", height: "9px", background: "var(--border-dark)" }}
+                    style={{ width: "1px", height: "9px", background: "rgba(201,169,110,0.2)" }}
                   />
                   <span
-                    className="font-display flex-1 group-hover:text-[var(--ivory)] transition-colors duration-200"
-                    style={{ fontSize: "clamp(0.78rem, 1vw, 0.9rem)", fontWeight: 300, color: "var(--warm-grey)", letterSpacing: "0.01em" }}
+                    className="font-display flex-1 group-hover:text-[#ffffff] transition-colors duration-200"
+                    style={{ fontSize: "clamp(0.78rem, 1vw, 0.9rem)", fontWeight: 300, color: "rgba(255,255,255,0.75)", letterSpacing: "0.01em" }}
                   >
                     {item.name}
                   </span>
@@ -167,6 +172,7 @@ function CategoryBar() {
                 </Link>
               ))}
             </div>
+
           </div>
         )}
       </div>
@@ -180,7 +186,7 @@ const LABEL_W = "96px"
 
 function TrendingRow() {
   return (
-    <div className="border-t border-[var(--border-dark)]" style={{ borderBottom: "1px solid rgba(201,169,110,0.4)" }}>
+    <div style={{ borderTop: "1px solid rgba(201,169,110,0.3)", borderBottom: "2px solid rgba(201,169,110,0.6)" }}>
       <div className="px-6 lg:px-10">
         <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           <div
@@ -195,7 +201,7 @@ function TrendingRow() {
             <div
               className="flex items-center justify-center"
               style={{
-                borderRight: "1px solid rgba(201,169,110,0.07)",
+                borderRight: "1px solid rgba(201,169,110,0.25)",
                 paddingRight: "1.2rem",
                 alignSelf: "stretch",
               }}
@@ -222,13 +228,13 @@ function TrendingRow() {
                   <Link
                     key={item.slug}
                     href={`/womens/category/${item.slug}`}
-                    className="relative py-[0.95rem] px-2 text-center font-display transition-colors duration-200 hover:text-[var(--ivory)]"
+                    className="relative py-[0.95rem] px-2 text-center font-display transition-colors duration-200 hover:text-[#ffffff]"
                     style={{
                       fontSize: "clamp(0.6rem, 0.78vw, 0.78rem)",
                       fontWeight: 300,
                       letterSpacing: "0.025em",
-                      color: "#C9A96E",
-                      borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.07)",
+                      color: "rgba(255,255,255,0.7)",
+                      borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.25)",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
