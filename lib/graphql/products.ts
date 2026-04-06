@@ -22,7 +22,15 @@ interface GqlResponse {
   errors?: { message: string }[]
 }
 
+export async function fetchWomensProducts(): Promise<GqlProductNode[]> {
+  return fetchProducts()
+}
+
 export async function fetchMensProducts(): Promise<GqlProductNode[]> {
+  return fetchProducts()
+}
+
+async function fetchProducts(): Promise<GqlProductNode[]> {
   if (!GQL_URL) {
     console.warn("NEXT_PUBLIC_WP_GRAPHQL_URL is not set")
     return []
