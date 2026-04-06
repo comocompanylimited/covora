@@ -3,6 +3,7 @@ import WomensProductCard from "@/components/womens/WomensProductCard";
 import WomensCategoryNav from "@/components/womens/WomensCategoryNav";
 import WomensHeader from "@/components/womens/WomensHeader";
 import WomensEditorialSection from "@/components/womens/WomensEditorialSection";
+import LuxuryFooter from "@/components/shared/LuxuryFooter";
 import { fetchWomensProducts } from "@/lib/graphql/products";
 
 export const dynamic = "force-dynamic";
@@ -182,5 +183,6 @@ export default async function WomensPage() {
       )}
 
     </div>
+    <LuxuryFooter />
   );
 }

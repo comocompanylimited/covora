@@ -1,12 +1,12 @@
 import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
+import FooterWrapper from "@/components/layout/FooterWrapper";
 
 export default function StoreLayout({ children }: { children: React.ReactNode }) {
   return (
     <>
       <Header />
       <main className="flex-1">{children}</main>
-      <Footer />
+      <FooterWrapper />
     </>
   );
 }

@@ -46,8 +46,8 @@ export default function Header() {
 
   useEffect(() => { setMobileOpen(false); }, [pathname]);
 
-  // Mens page uses its own isolated MensHeader — suppress shared header there.
-  if (pathname === "/mens") return null;
+  // Mens/Womens pages use their own isolated headers — suppress shared header there.
+  if (pathname === "/mens" || pathname === "/womens") return null;
 
   // On landing: transparent until scrolled. On other pages: always solid.
   const isSolid = !isLanding || scrolled;

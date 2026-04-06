@@ -3,6 +3,7 @@ import MensProductCard from "@/components/mens/MensProductCard";
 import MensCategoryNav from "@/components/mens/MensCategoryNav";
 import MensHeader from "@/components/mens/MensHeader";
 import MensEditorialSection from "@/components/mens/MensEditorialSection";
+import LuxuryFooter from "@/components/shared/LuxuryFooter";
 import { fetchMensProducts } from "@/lib/graphql/products";
 
 export const dynamic = "force-dynamic";
@@ -182,5 +183,6 @@ export default async function MensPage() {
       )}
 
     </div>
+    <LuxuryFooter />
   );
 }

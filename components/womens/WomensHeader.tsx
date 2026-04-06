@@ -3,15 +3,17 @@
 import { useState, useEffect, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useCart } from "@/store/cart"
 
 // ─── WomensHeader ─────────────────────────────────────────────────────────────
-// Womens-page-only header. Mirrors MensHeader — "Womens" is active.
+// Womens-page-only header. Suppresses shared Header via Header.tsx null-check.
+// Renders:
+//   • Fixed top bar — Mens/Womens left, Covora logo centre
+//   • Fixed vertical utility rail — right edge: Search only
+//   • Luxury search overlay — triggered from rail Search icon
 
 export default function WomensHeader() {
   const [scrolled, setScrolled]     = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
-  const { itemCount, openCart }     = useCart()
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 60)
@@ -95,9 +97,9 @@ export default function WomensHeader() {
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
           border: "1px solid rgba(255,255,255,0.06)",
-          transition: "opacity 0.4s ease",
         }}
       >
+        {/* Top hairline */}
         <div style={{ width: "1px", height: "20px", background: "linear-gradient(to bottom, transparent, rgba(201,169,110,0.4))" }} />
 
         {/* Search */}
@@ -118,64 +120,7 @@ export default function WomensHeader() {
           <SearchIcon />
         </button>
 
-        <div style={{ width: "1px", height: "16px", background: "rgba(255,255,255,0.08)" }} />
-
-        {/* Profile */}
-        <Link
-          href="/account"
-          aria-label="Account"
-          className="flex items-center justify-center"
-          style={{ color: "rgba(255,255,255,0.75)", transition: "color 0.25s ease, transform 0.25s ease" }}
-          onMouseEnter={e => {
-            ;(e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,1)"
-            ;(e.currentTarget as HTMLElement).style.transform = "scale(1.08)"
-          }}
-          onMouseLeave={e => {
-            ;(e.currentTarget as HTMLElement).style.color = "rgba(255,255,255,0.75)"
-            ;(e.currentTarget as HTMLElement).style.transform = "scale(1)"
-          }}
-        >
-          <ProfileIcon />
-        </Link>
-
-        <div style={{ width: "1px", height: "16px", background: "rgba(255,255,255,0.08)" }} />
-
-        {/* Cart */}
-        <button
-          onClick={openCart}
-          aria-label={`Bag — ${itemCount} item${itemCount !== 1 ? "s" : ""}`}
-          className="relative flex items-center justify-center"
-          style={{ color: "rgba(255,255,255,0.75)", transition: "color 0.25s ease, transform 0.25s ease" }}
-          onMouseEnter={e => {
-            e.currentTarget.style.color = "rgba(255,255,255,1)"
-            e.currentTarget.style.transform = "scale(1.08)"
-          }}
-          onMouseLeave={e => {
-            e.currentTarget.style.color = "rgba(255,255,255,0.75)"
-            e.currentTarget.style.transform = "scale(1)"
-          }}
-        >
-          <CartIcon />
-          {itemCount > 0 && (
-            <span
-              className="absolute flex items-center justify-center"
-              style={{
-                top: "-6px", right: "-6px",
-                width: "14px", height: "14px",
-                borderRadius: "50%",
-                background: "var(--gold)",
-                color: "var(--black)",
-                fontSize: "0.45rem",
-                fontWeight: 600,
-                fontFamily: "var(--font-inter)",
-                letterSpacing: 0,
-              }}
-            >
-              {itemCount > 9 ? "9+" : itemCount}
-            </span>
-          )}
-        </button>
-
+        {/* Bottom hairline */}
         <div style={{ width: "1px", height: "20px", background: "linear-gradient(to bottom, rgba(201,169,110,0.4), transparent)" }} />
       </div>
 
@@ -261,13 +206,10 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
           transition: "opacity 0.4s ease",
         }}
       />
-
       <div
         style={{
           position: "fixed",
-          top: 0,
-          left: 0,
-          right: 0,
+          top: 0, left: 0, right: 0,
           zIndex: 59,
           transform: open ? "translateY(0)" : "translateY(-100%)",
           transition: "transform 0.5s var(--ease-out-expo)",
@@ -284,38 +226,14 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
           }}
         >
           <div style={{ maxWidth: "860px" }}>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                marginBottom: "2.8rem",
-              }}
-            >
-              <span
-                className="label-caps"
-                style={{ fontSize: "0.42rem", letterSpacing: "0.45em", color: "rgba(201,169,110,0.45)" }}
-              >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "2.8rem" }}>
+              <span className="label-caps" style={{ fontSize: "0.42rem", letterSpacing: "0.45em", color: "rgba(201,169,110,0.45)" }}>
                 Search the Edit
               </span>
               <button
                 onClick={onClose}
                 aria-label="Close search"
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.5rem",
-                  background: "none",
-                  border: "none",
-                  cursor: "pointer",
-                  color: "var(--warm-grey-dark)",
-                  fontFamily: "var(--font-inter)",
-                  fontSize: "0.42rem",
-                  letterSpacing: "0.22em",
-                  textTransform: "uppercase",
-                  transition: "color 0.2s ease",
-                  padding: 0,
-                }}
+                style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "none", border: "none", cursor: "pointer", color: "var(--warm-grey-dark)", fontFamily: "var(--font-inter)", fontSize: "0.42rem", letterSpacing: "0.22em", textTransform: "uppercase", transition: "color 0.2s ease", padding: 0 }}
                 onMouseEnter={e => (e.currentTarget.style.color = "var(--warm-grey)")}
                 onMouseLeave={e => (e.currentTarget.style.color = "var(--warm-grey-dark)")}
               >
@@ -325,78 +243,26 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
                 Close
               </button>
             </div>
-
             <form onSubmit={handleSubmit}>
-              <div
-                style={{
-                  position: "relative",
-                  borderBottom: `1px solid ${query ? "rgba(201,169,110,0.4)" : "rgba(201,169,110,0.15)"}`,
-                  paddingBottom: "1.1rem",
-                  transition: "border-color 0.3s ease",
-                }}
-              >
+              <div style={{ position: "relative", borderBottom: `1px solid ${query ? "rgba(201,169,110,0.4)" : "rgba(201,169,110,0.15)"}`, paddingBottom: "1.1rem", transition: "border-color 0.3s ease" }}>
                 <input
                   ref={inputRef}
                   value={query}
                   onChange={e => setQuery(e.target.value)}
                   placeholder="What are you looking for?"
-                  style={{
-                    width: "100%",
-                    background: "transparent",
-                    border: "none",
-                    outline: "none",
-                    fontFamily: "var(--font-cormorant)",
-                    fontSize: "clamp(2rem, 4.5vw, 4rem)",
-                    fontWeight: 300,
-                    letterSpacing: "-0.01em",
-                    color: "var(--ivory)",
-                    caretColor: "rgba(201,169,110,0.8)",
-                    lineHeight: 1,
-                  }}
+                  style={{ width: "100%", background: "transparent", border: "none", outline: "none", fontFamily: "var(--font-cormorant)", fontSize: "clamp(2rem, 4.5vw, 4rem)", fontWeight: 300, letterSpacing: "-0.01em", color: "var(--ivory)", caretColor: "rgba(201,169,110,0.8)", lineHeight: 1 }}
                 />
                 {query && (
-                  <div
-                    style={{
-                      position: "absolute",
-                      right: 0,
-                      bottom: "1.1rem",
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "1rem",
-                      transform: "translateY(50%)",
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => { setQuery(""); inputRef.current?.focus() }}
-                      aria-label="Clear"
-                      style={{ background: "none", border: "none", cursor: "pointer", color: "var(--warm-grey-dark)", padding: "0.2rem", transition: "color 0.2s ease" }}
-                      onMouseEnter={e => (e.currentTarget.style.color = "var(--warm-grey)")}
-                      onMouseLeave={e => (e.currentTarget.style.color = "var(--warm-grey-dark)")}
-                    >
-                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.1">
-                        <path d="M1 1l9 9M10 1L1 10" strokeLinecap="round" />
-                      </svg>
+                  <div style={{ position: "absolute", right: 0, bottom: "1.1rem", display: "flex", alignItems: "center", gap: "1rem", transform: "translateY(50%)" }}>
+                    <button type="button" onClick={() => { setQuery(""); inputRef.current?.focus() }} aria-label="Clear" style={{ background: "none", border: "none", cursor: "pointer", color: "var(--warm-grey-dark)", padding: "0.2rem", transition: "color 0.2s ease" }} onMouseEnter={e => (e.currentTarget.style.color = "var(--warm-grey)")} onMouseLeave={e => (e.currentTarget.style.color = "var(--warm-grey-dark)")}>
+                      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.1"><path d="M1 1l9 9M10 1L1 10" strokeLinecap="round" /></svg>
                     </button>
                   </div>
                 )}
               </div>
-
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  marginTop: "1.4rem",
-                  opacity: 0.6,
-                }}
-              >
-                <span className="label-caps" style={{ fontSize: "0.4rem", letterSpacing: "0.2em", color: "var(--warm-grey-dark)" }}>
-                  {query ? "↵ to search" : "Begin typing"}
-                </span>
-                <span className="label-caps" style={{ fontSize: "0.4rem", letterSpacing: "0.2em", color: "var(--warm-grey-dark)" }}>
-                  Esc to close
-                </span>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "1.4rem", opacity: 0.6 }}>
+                <span className="label-caps" style={{ fontSize: "0.4rem", letterSpacing: "0.2em", color: "var(--warm-grey-dark)" }}>{query ? "↵ to search" : "Begin typing"}</span>
+                <span className="label-caps" style={{ fontSize: "0.4rem", letterSpacing: "0.2em", color: "var(--warm-grey-dark)" }}>Esc to close</span>
               </div>
             </form>
           </div>
@@ -413,25 +279,6 @@ function SearchIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
       <circle cx="11" cy="11" r="7.5" />
       <path d="m20.5 20.5-4-4" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function ProfileIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
-      <path d="M20 21v-1.5a4.5 4.5 0 0 0-4.5-4.5h-7A4.5 4.5 0 0 0 4 19.5V21" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  )
-}
-
-function CartIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
-      <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
-      <line x1="3" y1="6" x2="21" y2="6" />
-      <path d="M16 10a4 4 0 0 1-8 0" />
     </svg>
   )
 }
