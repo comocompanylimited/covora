@@ -32,7 +32,7 @@ function CategoryBar() {
   return (
     <div onMouseLeave={leave}>
       {/* ── Category row ───────────────────────────────────────── */}
-      <div style={{ borderTop: "1px solid rgba(201,169,110,0.3)", borderBottom: "1px solid rgba(201,169,110,0.3)" }}>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.18)", borderBottom: "1px solid rgba(255,255,255,0.18)" }}>
         <div className="px-6 lg:px-10">
           <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
             <div
@@ -54,7 +54,7 @@ function CategoryBar() {
                     className="relative py-[1.1rem] text-center transition-colors duration-200"
                     style={{
                       color: isActive ? "#ffffff" : "rgba(255,255,255,0.7)",
-                      borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.25)",
+                      borderRight: isLast ? "none" : "1px solid rgba(255,255,255,0.12)",
                     }}
                   >
                     <span
@@ -95,7 +95,7 @@ function CategoryBar() {
           opacity: activeId ? 1 : 0,
           transition: "max-height 0.28s var(--ease-out-expo), opacity 0.2s ease",
           background: "#050504",
-          borderBottom: activeId ? "1px solid rgba(201,169,110,0.25)" : "none",
+          borderBottom: activeId ? "1px solid rgba(255,255,255,0.12)" : "none",
         }}
       >
         {active && (
@@ -104,7 +104,7 @@ function CategoryBar() {
             {/* Panel header */}
             <div
               className="flex items-center gap-5 mb-5 pb-5"
-              style={{ borderBottom: "1px solid rgba(201,169,110,0.2)" }}
+              style={{ borderBottom: "1px solid rgba(255,255,255,0.12)" }}
             >
               <span
                 className="font-display text-[var(--ivory)]"
@@ -114,7 +114,7 @@ function CategoryBar() {
               </span>
               <span
                 className="block flex-shrink-0"
-                style={{ width: "1px", height: "12px", background: "rgba(201,169,110,0.2)" }}
+                style={{ width: "1px", height: "12px", background: "rgba(255,255,255,0.15)" }}
               />
               <Link
                 href={`/mens/category/${active.slug}`}
@@ -145,17 +145,17 @@ function CategoryBar() {
                 <Link
                   key={item.slug}
                   href={`/mens/category/${item.slug}`}
-                  className="group flex items-center gap-3 py-[0.7rem] pr-4 border-b border-[rgba(201,169,110,0.15)] hover:border-[rgba(201,169,110,0.35)] transition-all duration-200"
+                  className="group flex items-center gap-3 py-[0.7rem] pr-4 border-b border-[rgba(255,255,255,0.08)] hover:border-[rgba(255,255,255,0.2)] transition-all duration-200"
                 >
                   <span
                     className="label-caps tabular-nums flex-shrink-0 group-hover:text-[var(--gold)] transition-colors duration-200"
-                    style={{ fontSize: "0.37rem", letterSpacing: "0.1em", color: "rgba(201,169,110,0.5)", minWidth: "1.1rem", textAlign: "right" }}
+                    style={{ fontSize: "0.37rem", letterSpacing: "0.1em", color: "rgba(255,255,255,0.35)", minWidth: "1.1rem", textAlign: "right" }}
                   >
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   <span
                     className="flex-shrink-0 block group-hover:opacity-40 transition-opacity duration-200"
-                    style={{ width: "1px", height: "9px", background: "rgba(201,169,110,0.2)" }}
+                    style={{ width: "1px", height: "9px", background: "rgba(255,255,255,0.15)" }}
                   />
                   <span
                     className="font-display flex-1 group-hover:text-[#ffffff] transition-colors duration-200"
@@ -186,7 +186,7 @@ const LABEL_W = "96px"
 
 function TrendingRow() {
   return (
-    <div style={{ borderTop: "1px solid rgba(201,169,110,0.3)", borderBottom: "2px solid rgba(201,169,110,0.6)" }}>
+    <div style={{ borderTop: "1px solid rgba(255,255,255,0.18)", borderBottom: "2px solid rgba(255,255,255,0.3)" }}>
       <div className="px-6 lg:px-10">
         <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           <div
@@ -201,7 +201,7 @@ function TrendingRow() {
             <div
               className="flex items-center justify-center"
               style={{
-                borderRight: "1px solid rgba(201,169,110,0.25)",
+                borderRight: "1px solid rgba(255,255,255,0.12)",
                 paddingRight: "1.2rem",
                 alignSelf: "stretch",
               }}
@@ -234,7 +234,7 @@ function TrendingRow() {
                       fontWeight: 300,
                       letterSpacing: "0.025em",
                       color: "rgba(255,255,255,0.7)",
-                      borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.25)",
+                      borderRight: isLast ? "none" : "1px solid rgba(255,255,255,0.12)",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
