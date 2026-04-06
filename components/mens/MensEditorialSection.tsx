@@ -28,21 +28,6 @@ export default function MensEditorialSection() {
   return (
     <div style={{ position: "relative" }}>
 
-      {/* Dark-to-light gradient bridge */}
-      <div
-        aria-hidden
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          height: "80px",
-          background: "linear-gradient(to bottom, #0A0A0A, transparent)",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
-
       <section
         style={{
           background: "#F4F2EE",
