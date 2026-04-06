@@ -59,7 +59,7 @@ function CategoryBar() {
                     onClick={() => toggle(group.id)}
                     className="relative py-[1.1rem] text-center transition-colors duration-200"
                     style={{
-                      color: isActive ? "var(--ivory)" : "var(--warm-grey)",
+                      color: isActive ? "#ffffff" : "#C9A96E",
                       borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.07)",
                     }}
                   >
@@ -194,7 +194,7 @@ const LABEL_W = "96px"
 
 function TrendingRow() {
   return (
-    <div className="border-t border-[var(--border-dark)]">
+    <div className="border-t border-[var(--border-dark)]" style={{ borderBottom: "1px solid rgba(201,169,110,0.4)" }}>
       <div className="px-6 lg:px-10">
         <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
           <div
@@ -241,7 +241,7 @@ function TrendingRow() {
                       fontSize: "clamp(0.6rem, 0.78vw, 0.78rem)",
                       fontWeight: 300,
                       letterSpacing: "0.025em",
-                      color: "var(--warm-grey)",
+                      color: "#C9A96E",
                       borderRight: isLast ? "none" : "1px solid rgba(201,169,110,0.07)",
                       whiteSpace: "nowrap",
                       overflow: "hidden",
