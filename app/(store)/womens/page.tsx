@@ -18,6 +18,7 @@ export default async function WomensPage() {
   const products = await fetchWomensProducts();
 
   return (
+    <>
     <div className="bg-[var(--black)] min-h-screen">
 
       <WomensHeader />
@@ -184,5 +185,6 @@ export default async function WomensPage() {
 
     </div>
     <LuxuryFooter />
+    </>
   );
 }

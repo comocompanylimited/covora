@@ -21,26 +21,29 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: "Covora — Modern Luxury",
+    default: "Covora — Women's Luxury Fashion",
     template: "%s | Covora",
   },
   description:
-    "Covora is a luxury fashion and beauty house crafting refined pieces for the modern individual.",
-  keywords: ["luxury fashion", "covora", "mens fashion", "womens fashion", "luxury beauty"],
+    "Covora is a women's luxury fashion house. Shop refined clothing, shoes, bags and beauty for the modern woman.",
+  keywords: [
+    "luxury women's fashion", "covora", "women's clothing", "luxury dresses",
+    "designer bags", "luxury beauty", "women's shoes", "luxury fashion uk",
+  ],
   openGraph: {
-    type: "website",
-    locale: "en_US",
+    type:     "website",
+    locale:   "en_GB",
     siteName: "Covora",
-    title: "Covora — Modern Luxury",
+    title:    "Covora — Women's Luxury Fashion",
     description:
-      "A luxury fashion and beauty house crafting refined pieces for the modern individual.",
+      "A women's luxury fashion house. Refined clothing, shoes, bags and beauty for the modern woman.",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Covora — Modern Luxury",
+    card:  "summary_large_image",
+    title: "Covora — Women's Luxury Fashion",
   },
   robots: {
-    index: true,
+    index:  true,
     follow: true,
   },
 };

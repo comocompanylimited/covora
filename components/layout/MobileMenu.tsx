@@ -1,25 +1,30 @@
 "use client";
 
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import Logo from "@/components/common/Logo";
+
+interface NavLink  { label: string; href: string; }
+interface NavItem  { label: string; href: string; mega?: { columns: { heading: string; links: NavLink[] }[] } }
 
 interface MobileMenuProps {
-  links: { label: string; href: string }[];
-  isOpen: boolean;
-  onClose: () => void;
+  links:    NavItem[];
+  isOpen:   boolean;
+  onClose:  () => void;
 }
 
 export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) {
-  // Lock body scroll when open
+  const [expanded, setExpanded] = useState<string | null>(null);
+
+  // Lock body scroll
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = isOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
+  }, [isOpen]);
+
+  // Reset expansion on close
+  useEffect(() => {
+    if (!isOpen) setExpanded(null);
   }, [isOpen]);
 
   return (
@@ -27,7 +32,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 z-[60] bg-black/60 backdrop-blur-sm transition-opacity duration-500",
+          "fixed inset-0 z-[110] bg-black/65 backdrop-blur-sm transition-opacity duration-500",
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
         onClick={onClose}
@@ -36,66 +41,186 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
       {/* Drawer */}
       <div
         className={cn(
-          "fixed top-0 left-0 h-full w-[80vw] max-w-sm z-[70] bg-[var(--charcoal)] flex flex-col",
-          "transition-transform duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]",
+          "fixed top-0 left-0 h-full w-[88vw] max-w-[400px] z-[120] flex flex-col",
+          "transition-transform duration-[520ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
+        style={{ background: "var(--charcoal)", borderRight: "1px solid var(--border-subtle)" }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-8 h-[72px] border-b border-[var(--border-dark)]">
-          <Logo size="md" />
+        <div
+          className="flex items-center justify-between"
+          style={{
+            height: "var(--header-height)",
+            padding: "0 1.5rem",
+            borderBottom: "1px solid var(--border-subtle)",
+          }}
+        >
+          <Link
+            href="/"
+            onClick={onClose}
+            style={{
+              fontFamily: "var(--font-cormorant)",
+              fontSize:   "1.35rem",
+              fontWeight: 300,
+              letterSpacing: "0.42em",
+              textTransform: "uppercase",
+              color: "var(--gold)",
+              textDecoration: "none",
+              paddingRight: "0.42em",
+            }}
+          >
+            Covora
+          </Link>
           <button
             onClick={onClose}
-            className="text-[var(--warm-grey)] hover:text-[var(--gold)] transition-colors"
             aria-label="Close menu"
+            style={{ color: "var(--warm-grey)", transition: "color var(--transition-fast)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--off-white)")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--warm-grey)")}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
               <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
             </svg>
           </button>
         </div>
 
-        {/* Nav Links */}
-        <nav className="flex-1 overflow-y-auto px-8 py-10">
-          <ul className="space-y-1">
-            {links.map((link, i) => (
-              <li key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={onClose}
-                  className={cn(
-                    "block py-4 text-[var(--off-white)] hover:text-[var(--gold)] transition-colors duration-300",
-                    "font-[var(--font-cormorant)] text-2xl font-light tracking-wide border-b border-[var(--border-dark)]",
-                    "opacity-0 translate-y-2",
-                    isOpen && "animate-fade-up"
+        {/* Nav */}
+        <nav className="flex-1 overflow-y-auto" style={{ padding: "1.5rem 0" }}>
+          {links.map((item, i) => {
+            const hasSub = !!item.mega;
+            const isExpanded = expanded === item.label;
+
+            return (
+              <div key={item.href} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+                <div className="flex items-center justify-between">
+                  <Link
+                    href={item.href}
+                    onClick={hasSub ? undefined : onClose}
+                    className={cn(
+                      "flex-1 py-5 px-6",
+                      "opacity-0",
+                      isOpen && "animate-fade-up"
+                    )}
+                    style={{
+                      fontFamily:    "var(--font-cormorant)",
+                      fontSize:      "clamp(1.4rem, 4vw, 1.7rem)",
+                      fontWeight:    300,
+                      color:         "var(--text-primary)",
+                      textDecoration:"none",
+                      letterSpacing: "0.02em",
+                      display:       "block",
+                      animationDelay:`${i * 50 + 80}ms`,
+                      animationFillMode: "forwards",
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+
+                  {hasSub && (
+                    <button
+                      onClick={() => setExpanded(isExpanded ? null : item.label)}
+                      style={{
+                        padding: "1.25rem 1.5rem",
+                        color:   "var(--warm-grey)",
+                        transition: "color var(--transition-fast), transform 0.3s ease",
+                        transform: isExpanded ? "rotate(45deg)" : "rotate(0deg)",
+                        flexShrink: 0,
+                      }}
+                      aria-label={isExpanded ? "Collapse" : "Expand"}
+                    >
+                      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.2">
+                        <path d="M7 1v12M1 7h12" strokeLinecap="round" />
+                      </svg>
+                    </button>
                   )}
-                  style={{ animationDelay: `${i * 60 + 100}ms`, animationFillMode: "forwards" }}
-                >
-                  {link.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+                </div>
+
+                {/* Sub-links */}
+                {hasSub && isExpanded && (
+                  <div
+                    style={{
+                      background:   "var(--surface-2)",
+                      borderTop:    "1px solid var(--border-subtle)",
+                      padding:      "1.25rem 1.5rem 1.5rem",
+                      animation:    "fadeDown 0.25s var(--ease-out-expo) both",
+                    }}
+                  >
+                    {item.mega!.columns.map((col) => (
+                      <div key={col.heading} style={{ marginBottom: "1.25rem" }}>
+                        <p
+                          className="label-caps"
+                          style={{ fontSize: "0.5rem", color: "var(--gold)", marginBottom: "0.75rem" }}
+                        >
+                          {col.heading}
+                        </p>
+                        <div style={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
+                          {col.links.map((link) => (
+                            <Link
+                              key={link.href}
+                              href={link.href}
+                              onClick={onClose}
+                              style={{
+                                fontFamily:    "var(--font-inter)",
+                                fontSize:      "0.8rem",
+                                color:         "var(--text-muted)",
+                                textDecoration:"none",
+                                letterSpacing: "0.02em",
+                                padding:       "0.35rem 0",
+                                transition:    "color var(--transition-fast)",
+                              }}
+                            >
+                              {link.label}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         {/* Footer links */}
-        <div className="px-8 py-8 border-t border-[var(--border-dark)]">
-          <div className="flex flex-col gap-3">
+        <div
+          style={{
+            borderTop: "1px solid var(--border-subtle)",
+            padding:   "1.5rem",
+            display:   "flex",
+            flexDirection: "column",
+            gap: "1rem",
+          }}
+        >
+          <div style={{ display: "flex", gap: "1.5rem" }}>
             {[
               { label: "Account", href: "/account" },
-              { label: "Search", href: "/search" },
               { label: "Contact", href: "/contact" },
+              { label: "FAQs",    href: "/faqs" },
             ].map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={onClose}
-                className="label-caps text-[var(--warm-grey)] hover:text-[var(--gold)] transition-colors duration-300"
+                className="label-caps"
+                style={{
+                  fontSize:      "0.52rem",
+                  color:         "var(--text-muted)",
+                  textDecoration:"none",
+                  transition:    "color var(--transition-fast)",
+                }}
               >
                 {link.label}
               </Link>
             ))}
           </div>
+          <p
+            className="label-caps"
+            style={{ fontSize: "0.48rem", color: "var(--text-muted)", opacity: 0.5 }}
+          >
+            © {new Date().getFullYear()} Covora — Refined Luxury
+          </p>
         </div>
       </div>
     </>
