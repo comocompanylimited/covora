@@ -21,7 +21,7 @@ export default function SalePage() {
   return (
     <div
       style={{
-        background: "var(--surface-base)",
+        background: "#FAFAF8",
         minHeight:  "100vh",
         paddingTop: "var(--header-height)",
       }}
@@ -29,8 +29,8 @@ export default function SalePage() {
       {/* ── Hero banner ─────────────────────────────────────── */}
       <div
         style={{
-          background:    "linear-gradient(135deg, var(--surface-1) 0%, var(--charcoal-soft) 100%)",
-          borderBottom:  "1px solid var(--border-subtle)",
+          background:    "linear-gradient(135deg, #F5F3F0 0%, rgba(0,0,0,0.04) 100%)",
+          borderBottom:  "1px solid rgba(0,0,0,0.07)",
           padding:       "clamp(4rem, 8vw, 8rem) clamp(1.5rem, 4vw, 4rem)",
           textAlign:     "center",
           position:      "relative",
@@ -54,7 +54,7 @@ export default function SalePage() {
               fontFamily:    "var(--font-cormorant)",
               fontSize:      "clamp(3.5rem, 9vw, 9rem)",
               fontWeight:    300,
-              color:         "var(--text-primary)",
+              color:         "#111111",
               letterSpacing: "-0.025em",
               lineHeight:    0.88,
               marginBottom:  "2rem",
@@ -68,7 +68,7 @@ export default function SalePage() {
               fontFamily:  "var(--font-cormorant)",
               fontSize:    "clamp(1rem, 1.5vw, 1.3rem)",
               fontStyle:   "italic",
-              color:       "var(--text-muted)",
+              color:       "#888888",
               letterSpacing: "0.04em",
               marginBottom: "3rem",
             }}
@@ -85,7 +85,7 @@ export default function SalePage() {
                 className="sale-cat-link badge"
                 style={{
                   background:    "transparent",
-                  color:         "var(--text-muted)",
+                  color:         "#888888",
                   border:        "1px solid var(--border-default)",
                   fontSize:      "0.55rem",
                   padding:       "0.45rem 1.1rem",
@@ -132,7 +132,7 @@ export default function SalePage() {
             fontFamily:    "var(--font-cormorant)",
             fontSize:      "clamp(1.8rem, 3vw, 3rem)",
             fontWeight:    300,
-            color:         "var(--text-primary)",
+            color:         "#111111",
             letterSpacing: "0.02em",
             marginBottom:  "1.25rem",
           }}
@@ -143,7 +143,7 @@ export default function SalePage() {
           style={{
             fontFamily:  "var(--font-inter)",
             fontSize:    "0.82rem",
-            color:       "var(--text-muted)",
+            color:       "#888888",
             maxWidth:    "420px",
             margin:      "0 auto 3rem",
             lineHeight:  1.85,

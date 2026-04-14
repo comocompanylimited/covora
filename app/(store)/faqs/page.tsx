@@ -106,7 +106,7 @@ function PageHeader() {
   return (
     <div style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", padding: "0 clamp(1.5rem, 4vw, 4rem)" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto", height: "72px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link href="/" style={{ textDecoration: "none" }}>
+        <Link href="/home" style={{ textDecoration: "none" }}>
           <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.4rem", fontWeight: 300, letterSpacing: "0.44em", textTransform: "uppercase", color: "var(--gold)", paddingRight: "0.44em" }}>
             Covora
           </span>

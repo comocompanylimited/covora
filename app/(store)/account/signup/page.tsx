@@ -4,7 +4,6 @@ import { useState, type FormEvent } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/store/auth"
-import { AuthPageShell, LuxuryInput, GoldButton } from "../login/page"
 
 export default function SignupPage() {
   const { signUp, isAuthenticated } = useAuth()
@@ -25,14 +24,8 @@ export default function SignupPage() {
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setError("")
-    if (!firstName || !email || !password) {
-      setError("Please fill in all required fields.")
-      return
-    }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters.")
-      return
-    }
+    if (!firstName || !email || !password) { setError("Please fill in all required fields."); return }
+    if (password.length < 6) { setError("Password must be at least 6 characters."); return }
     setLoading(true)
     try {
       await signUp({ firstName, lastName, email, password })
@@ -45,87 +38,158 @@ export default function SignupPage() {
   }
 
   return (
-    <AuthPageShell>
-      {/* Heading */}
-      <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
-        <p
-          className="label-caps"
-          style={{ fontSize: "0.42rem", letterSpacing: "0.45em", color: "rgba(201,169,110,0.55)", marginBottom: "1.4rem" }}
-        >
-          My Account
-        </p>
-        <h1
-          style={{
-            fontFamily: "var(--font-cormorant)",
-            fontSize: "clamp(2.2rem, 4vw, 3rem)",
-            fontWeight: 300,
-            letterSpacing: "0.05em",
-            color: "var(--ivory)",
-            lineHeight: 1.1,
-            marginBottom: "0.8rem",
-          }}
-        >
-          Join Covora
-        </h1>
-        <p
-          style={{
-            fontFamily: "var(--font-cormorant)",
-            fontSize: "1.05rem",
-            fontWeight: 300,
-            fontStyle: "italic",
-            color: "var(--warm-grey)",
-            letterSpacing: "0.04em",
-          }}
-        >
-          Create your account to begin
-        </p>
+    <AuthShell>
+      <div style={{ textAlign: "center", marginBottom: "2.75rem" }}>
+        <p style={{
+          fontFamily: "var(--font-inter)",
+          fontSize: "0.5rem",
+          fontWeight: 600,
+          letterSpacing: "0.32em",
+          textTransform: "uppercase",
+          color: "var(--gold-dark)",
+          marginBottom: "1.25rem",
+        }}>Join Covora</p>
+        <h1 style={{
+          fontFamily: "var(--font-cormorant)",
+          fontSize: "clamp(2rem, 4vw, 2.8rem)",
+          fontWeight: 300,
+          color: "#111111",
+          lineHeight: 1.1,
+          marginBottom: "0.6rem",
+        }}>Create your account</h1>
+        <p style={{
+          fontFamily: "var(--font-cormorant)",
+          fontSize: "1rem",
+          fontStyle: "italic",
+          fontWeight: 300,
+          color: "#888888",
+        }}>Access exclusive pieces and manage your orders</p>
       </div>
 
-      <div style={{ width: "32px", height: "1px", background: "rgba(201,169,110,0.35)", margin: "0 auto 3rem" }} />
-
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <LuxuryInput label="First name *" value={firstName} onChange={setFirstName} placeholder="First" autoComplete="given-name" />
-          <LuxuryInput label="Last name"    value={lastName}  onChange={setLastName}  placeholder="Last"  autoComplete="family-name" />
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.1rem" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.85rem" }}>
+          <Field label="First Name">
+            <input type="text" className="acct-input" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Jane" autoComplete="given-name" required />
+          </Field>
+          <Field label="Last Name">
+            <input type="text" className="acct-input" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Smith" autoComplete="family-name" />
+          </Field>
         </div>
-        <LuxuryInput label="Email address *" type="email"    value={email}    onChange={setEmail}    placeholder="you@example.com"    autoComplete="email" />
-        <LuxuryInput label="Password *"      type="password" value={password} onChange={setPassword} placeholder="Min. 8 characters" autoComplete="new-password" />
+        <Field label="Email Address">
+          <input type="email" className="acct-input" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="jane@example.com" autoComplete="email" required />
+        </Field>
+        <Field label="Password">
+          <input type="password" className="acct-input" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min. 6 characters" autoComplete="new-password" required />
+        </Field>
 
         {error && (
-          <p style={{ fontSize: "0.62rem", letterSpacing: "0.04em", color: "#c97a6e", textAlign: "center" }}>
-            {error}
-          </p>
+          <p style={{
+            fontFamily: "var(--font-inter)",
+            fontSize: "0.65rem",
+            color: "#B84040",
+            padding: "0.7rem 0.85rem",
+            border: "1px solid rgba(184,64,64,0.2)",
+            background: "rgba(184,64,64,0.04)",
+          }}>{error}</p>
         )}
 
-        <GoldButton type="submit" disabled={loading}>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "0.95rem",
+            background: loading ? "#888888" : "#111111",
+            color: "#FFFFFF",
+            border: "none",
+            fontFamily: "var(--font-inter)",
+            fontSize: "0.58rem",
+            fontWeight: 600,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            cursor: loading ? "not-allowed" : "pointer",
+            marginTop: "0.5rem",
+            transition: "background 0.25s ease",
+          }}
+        >
           {loading ? "Creating account…" : "Create Account"}
-        </GoldButton>
+        </button>
       </form>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "1rem",
-          margin: "2.5rem 0",
-        }}
-      >
-        <div style={{ flex: 1, height: "1px", background: "var(--border-dark)" }} />
-        <span className="label-caps" style={{ fontSize: "0.38rem", letterSpacing: "0.25em", color: "var(--warm-grey-dark)" }}>or</span>
-        <div style={{ flex: 1, height: "1px", background: "var(--border-dark)" }} />
-      </div>
-
-      <p style={{ textAlign: "center", fontSize: "0.62rem", letterSpacing: "0.04em", color: "var(--warm-grey)" }}>
+      <p style={{
+        textAlign: "center",
+        fontFamily: "var(--font-inter)",
+        fontSize: "0.65rem",
+        color: "#AAAAAA",
+        marginTop: "2rem",
+      }}>
         Already have an account?{" "}
-        <Link
-          href="/account/login"
-          style={{ color: "var(--gold)", textDecoration: "none", transition: "color 0.2s ease" }}
-          onMouseEnter={e => (e.currentTarget.style.color = "var(--gold-light)")}
-          onMouseLeave={e => (e.currentTarget.style.color = "var(--gold)")}
+        <Link href="/account/login" style={{ color: "#333333", textDecoration: "none", fontWeight: 500 }}
+          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.color = "var(--gold-dark)")}
+          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.color = "#333333")}
         >
           Sign in
         </Link>
       </p>
-    </AuthPageShell>
+    </AuthShell>
+  )
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.4rem" }}>
+      <label style={{
+        fontFamily: "var(--font-inter)",
+        fontSize: "0.5rem",
+        fontWeight: 600,
+        letterSpacing: "0.14em",
+        textTransform: "uppercase",
+        color: "#888888",
+      }}>{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function AuthShell({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{
+      background: "#FAFAF8",
+      minHeight: "100vh",
+      paddingTop: "var(--header-height)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: `var(--header-height) 1.5rem 4rem`,
+    }}>
+      <div style={{
+        width: "100%",
+        maxWidth: "460px",
+        background: "#FFFFFF",
+        border: "1px solid rgba(0,0,0,0.07)",
+        padding: "clamp(2rem, 5vw, 3rem)",
+      }}>
+        <div style={{ width: "100%", height: "2px", background: "var(--gold)", marginBottom: "2.5rem" }} />
+        {children}
+      </div>
+      <style>{`
+        .acct-input {
+          width: 100%;
+          background: #FFFFFF;
+          border: 1px solid rgba(0,0,0,0.14);
+          border-radius: 0;
+          padding: 0.72rem 0.85rem;
+          font-family: var(--font-inter);
+          font-size: 0.78rem;
+          color: #111111;
+          outline: none;
+          box-sizing: border-box;
+          transition: border-color 0.2s ease;
+        }
+        .acct-input:focus { border-color: var(--gold); }
+        .acct-input:hover { border-color: rgba(0,0,0,0.28); }
+        .acct-input::placeholder { color: #CCCCCC; }
+      `}</style>
+    </div>
   )
 }

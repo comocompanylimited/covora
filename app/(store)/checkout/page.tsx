@@ -1,0 +1,482 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useCart } from "@/store/cart";
+import { formatPrice } from "@/lib/utils";
+
+type Step = "contact" | "shipping" | "payment" | "review";
+
+const STEPS: { id: Step; label: string }[] = [
+  { id: "contact",  label: "Contact" },
+  { id: "shipping", label: "Shipping" },
+  { id: "payment",  label: "Payment" },
+  { id: "review",   label: "Review" },
+];
+
+const INPUT: React.CSSProperties = {
+  width: "100%",
+  background: "#FFFFFF",
+  border: "1px solid rgba(0,0,0,0.14)",
+  borderRadius: 0,
+  padding: "0.75rem 0.85rem",
+  fontFamily: "var(--font-inter)",
+  fontSize: "0.78rem",
+  color: "#111111",
+  outline: "none",
+  boxSizing: "border-box",
+};
+
+const LABEL: React.CSSProperties = {
+  display: "block",
+  fontFamily: "var(--font-inter)",
+  fontSize: "0.52rem",
+  fontWeight: 600,
+  letterSpacing: "0.14em",
+  textTransform: "uppercase" as const,
+  color: "#888888",
+  marginBottom: "0.45rem",
+};
+
+const SELECT: React.CSSProperties = {
+  ...INPUT,
+  appearance: "none" as const,
+  cursor: "pointer",
+  backgroundImage: `url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23888888' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E")`,
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 0.85rem center",
+  paddingRight: "2.25rem",
+};
+
+export default function CheckoutPage() {
+  const { items, subtotal } = useCart();
+  const [step, setStep] = useState<Step>("contact");
+
+  const currentIndex = STEPS.findIndex((s) => s.id === step);
+
+  if (items.length === 0) {
+    return (
+      <div style={{
+        background: "#FAFAF8",
+        minHeight: "100vh",
+        paddingTop: "var(--header-height)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}>
+        <div style={{ textAlign: "center", padding: "4rem 2rem" }}>
+          <div style={{ width: "40px", height: "1px", background: "rgba(201,169,110,0.5)", margin: "0 auto 2.5rem" }} />
+          <h1 style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(2rem, 4vw, 3rem)", fontWeight: 300, color: "#111111", marginBottom: "1rem" }}>
+            Your bag is empty
+          </h1>
+          <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.78rem", color: "#888888", marginBottom: "2rem" }}>
+            Add some pieces before proceeding to checkout.
+          </p>
+          <Link
+            href="/shop"
+            style={{
+              display: "inline-block",
+              fontFamily: "var(--font-inter)",
+              fontSize: "0.58rem",
+              fontWeight: 600,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#FFFFFF",
+              background: "#111111",
+              padding: "0.9rem 2.5rem",
+              textDecoration: "none",
+            }}
+          >
+            Continue Shopping
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ background: "#FAFAF8", minHeight: "100vh", paddingTop: "var(--header-height)" }}>
+      <div
+        style={{
+          maxWidth: "var(--container-wide)",
+          margin: "0 auto",
+          padding: "clamp(2rem, 5vw, 4rem) clamp(1.5rem, 4vw, 4rem)",
+          display: "grid",
+          gridTemplateColumns: "1fr 360px",
+          gap: "clamp(3rem, 5vw, 6rem)",
+          alignItems: "start",
+        }}
+        className="checkout-layout"
+      >
+
+        {/* ── Left: Form ────────────────────────────────────── */}
+        <div>
+          {/* Progress */}
+          <div style={{ display: "flex", alignItems: "center", marginBottom: "2.5rem" }}>
+            {STEPS.map((s, i) => (
+              <div key={s.id} style={{ display: "flex", alignItems: "center", flex: i < STEPS.length - 1 ? "1" : "0" }}>
+                <div
+                  style={{ display: "flex", alignItems: "center", gap: "0.5rem", cursor: i <= currentIndex ? "pointer" : "default" }}
+                  onClick={() => { if (i <= currentIndex) setStep(s.id); }}
+                >
+                  <div style={{
+                    width: "22px",
+                    height: "22px",
+                    border: `1px solid ${i <= currentIndex ? "var(--gold)" : "rgba(0,0,0,0.18)"}`,
+                    borderRadius: "50%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    background: i < currentIndex ? "var(--gold)" : "transparent",
+                    flexShrink: 0,
+                  }}>
+                    {i < currentIndex ? (
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#111111" strokeWidth="1.5">
+                        <path d="M1.5 5L4 7.5L8.5 2.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    ) : (
+                      <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.48rem", fontWeight: 600, color: i === currentIndex ? "var(--gold)" : "#BBBBBB" }}>
+                        {i + 1}
+                      </span>
+                    )}
+                  </div>
+                  <span style={{
+                    fontFamily: "var(--font-inter)",
+                    fontSize: "0.52rem",
+                    fontWeight: 600,
+                    letterSpacing: "0.14em",
+                    textTransform: "uppercase",
+                    color: i === currentIndex ? "var(--gold-dark)" : i < currentIndex ? "#555555" : "#AAAAAA",
+                  }}>
+                    {s.label}
+                  </span>
+                </div>
+                {i < STEPS.length - 1 && (
+                  <div style={{ flex: 1, height: "1px", background: i < currentIndex ? "var(--gold)" : "rgba(0,0,0,0.1)", margin: "0 0.75rem" }} />
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Step content */}
+          <div style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)", padding: "clamp(1.5rem, 3vw, 2.5rem)" }}>
+            {step === "contact"  && <ContactStep  onNext={() => setStep("shipping")} />}
+            {step === "shipping" && <ShippingStep onNext={() => setStep("payment")} />}
+            {step === "payment"  && <PaymentStep  onNext={() => setStep("review")} />}
+            {step === "review"   && <ReviewStep />}
+          </div>
+        </div>
+
+        {/* ── Right: Order summary ──────────────────────────── */}
+        <div style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)", padding: "2rem", position: "sticky", top: "calc(var(--header-height) + 2rem)" }}>
+          <div style={{ width: "100%", height: "2px", background: "var(--gold)", marginBottom: "1.5rem" }} />
+          <p style={{
+            fontFamily: "var(--font-inter)",
+            fontSize: "0.52rem",
+            fontWeight: 600,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color: "#888888",
+            marginBottom: "1.5rem",
+          }}>
+            Order Summary
+          </p>
+
+          {/* Items */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
+            {items.map((item) => (
+              <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+                <div>
+                  <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#333333", marginBottom: "0.2rem", lineHeight: 1.4 }}>
+                    {item.name}
+                    {item.quantity > 1 && <span style={{ color: "#AAAAAA", marginLeft: "0.4rem" }}>×{item.quantity}</span>}
+                  </p>
+                  {Object.keys(item.selectedAttributes).length > 0 && (
+                    <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.62rem", color: "#AAAAAA" }}>
+                      {Object.entries(item.selectedAttributes).map(([k, v]) => `${k}: ${v}`).join(" · ")}
+                    </p>
+                  )}
+                </div>
+                <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "0.95rem", color: "#333333", flexShrink: 0 }}>
+                  {formatPrice(item.price * item.quantity)}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ height: "1px", background: "rgba(0,0,0,0.07)", marginBottom: "1.25rem" }} />
+
+          {/* Totals */}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.25rem" }}>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#888888" }}>Subtotal</span>
+              <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "0.95rem", color: "#333333" }}>{formatPrice(subtotal)}</span>
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#888888" }}>Shipping</span>
+              <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.7rem", color: "var(--gold-dark)" }}>Calculated next step</span>
+            </div>
+          </div>
+
+          <div style={{ height: "1px", background: "rgba(0,0,0,0.07)", marginBottom: "1.25rem" }} />
+
+          <div style={{ display: "flex", justifyContent: "space-between" }}>
+            <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1rem", color: "#111111", fontWeight: 400 }}>Total</span>
+            <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.1rem", color: "#111111", fontWeight: 400 }}>{formatPrice(subtotal)}</span>
+          </div>
+
+          <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.58rem", color: "#CCCCCC", marginTop: "1rem", letterSpacing: "0.04em" }}>
+            Taxes calculated at checkout.
+          </p>
+        </div>
+      </div>
+
+      <style>{`
+        @media (max-width: 900px) {
+          .checkout-layout { grid-template-columns: 1fr !important; }
+        }
+        .checkout-input:focus { border-color: var(--gold) !important; outline: none; }
+        .checkout-input:hover { border-color: rgba(0,0,0,0.28) !important; }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Step components ──────────────────────────────────────────────────────────
+
+function FG({ children }: { children: React.ReactNode }) {
+  return <div style={{ display: "flex", flexDirection: "column" }}>{children}</div>;
+}
+
+function ContactStep({ onNext }: { onNext: () => void }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.6rem", fontWeight: 300, color: "#111111", marginBottom: "0.25rem" }}>
+        Contact Information
+      </h2>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <FG>
+          <label style={LABEL}>First Name</label>
+          <input type="text" className="checkout-input" style={INPUT} placeholder="Jane" />
+        </FG>
+        <FG>
+          <label style={LABEL}>Last Name</label>
+          <input type="text" className="checkout-input" style={INPUT} placeholder="Smith" />
+        </FG>
+      </div>
+      <FG>
+        <label style={LABEL}>Email Address</label>
+        <input type="email" className="checkout-input" style={INPUT} placeholder="jane@example.com" />
+      </FG>
+      <FG>
+        <label style={LABEL}>Phone (optional)</label>
+        <input type="tel" className="checkout-input" style={INPUT} placeholder="+44 7700 000000" />
+      </FG>
+      <div style={{ paddingTop: "0.5rem" }}>
+        <ContinueButton onClick={onNext} label="Continue to Shipping" />
+      </div>
+    </div>
+  );
+}
+
+function ShippingStep({ onNext }: { onNext: () => void }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.6rem", fontWeight: 300, color: "#111111", marginBottom: "0.25rem" }}>
+        Shipping Address
+      </h2>
+      <FG>
+        <label style={LABEL}>Address Line 1</label>
+        <input type="text" className="checkout-input" style={INPUT} placeholder="123 Mayfair Street" />
+      </FG>
+      <FG>
+        <label style={LABEL}>Address Line 2 (optional)</label>
+        <input type="text" className="checkout-input" style={INPUT} placeholder="Apartment, floor, etc." />
+      </FG>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+        <FG>
+          <label style={LABEL}>City</label>
+          <input type="text" className="checkout-input" style={INPUT} placeholder="London" />
+        </FG>
+        <FG>
+          <label style={LABEL}>Postcode</label>
+          <input type="text" className="checkout-input" style={INPUT} placeholder="W1K 1AA" />
+        </FG>
+      </div>
+      <FG>
+        <label style={LABEL}>Country</label>
+        <select className="checkout-input" style={SELECT}>
+          <option>United Kingdom</option>
+          <option>United States</option>
+          <option>France</option>
+          <option>Germany</option>
+          <option>Australia</option>
+        </select>
+      </FG>
+
+      {/* Shipping methods */}
+      <div style={{ paddingTop: "0.5rem" }}>
+        <p style={{
+          fontFamily: "var(--font-inter)",
+          fontSize: "0.52rem",
+          fontWeight: 600,
+          letterSpacing: "0.2em",
+          textTransform: "uppercase",
+          color: "var(--gold-dark)",
+          marginBottom: "0.85rem",
+        }}>
+          Shipping Method
+        </p>
+        <div style={{ display: "flex", flexDirection: "column", gap: "0.65rem" }}>
+          {[
+            { id: "standard", label: "Standard Delivery", time: "3–5 business days", price: "£4.95" },
+            { id: "express",  label: "Express Delivery",  time: "1–2 business days", price: "£12.95" },
+            { id: "next-day", label: "Next Day Delivery", time: "Order by 2pm",       price: "£19.95" },
+          ].map((method, i) => (
+            <label
+              key={method.id}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                padding: "0.85rem 1rem",
+                border: `1px solid ${i === 0 ? "var(--gold)" : "rgba(0,0,0,0.1)"}`,
+                cursor: "pointer",
+                background: i === 0 ? "rgba(201,169,110,0.04)" : "transparent",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <div style={{
+                  width: "14px",
+                  height: "14px",
+                  border: `1px solid ${i === 0 ? "var(--gold)" : "rgba(0,0,0,0.2)"}`,
+                  borderRadius: "50%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}>
+                  {i === 0 && <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: "var(--gold)" }} />}
+                </div>
+                <div>
+                  <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.75rem", color: "#111111" }}>{method.label}</p>
+                  <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.62rem", color: "#999999" }}>{method.time}</p>
+                </div>
+              </div>
+              <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "0.95rem", color: "#333333" }}>{method.price}</span>
+            </label>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ paddingTop: "0.5rem" }}>
+        <ContinueButton onClick={onNext} label="Continue to Payment" />
+      </div>
+    </div>
+  );
+}
+
+function PaymentStep({ onNext }: { onNext: () => void }) {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.6rem", fontWeight: 300, color: "#111111", marginBottom: "0.25rem" }}>
+        Payment
+      </h2>
+      <div style={{ padding: "1.25rem", border: "1px solid rgba(0,0,0,0.07)", background: "#FAF9F7" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="1.5">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.68rem", color: "#888888" }}>
+            Secure 256-bit SSL encryption
+          </span>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+          <FG>
+            <label style={LABEL}>Card Number</label>
+            <input type="text" className="checkout-input" style={INPUT} placeholder="0000 0000 0000 0000" maxLength={19} />
+          </FG>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
+            <FG>
+              <label style={LABEL}>Expiry</label>
+              <input type="text" className="checkout-input" style={INPUT} placeholder="MM / YY" maxLength={7} />
+            </FG>
+            <FG>
+              <label style={LABEL}>CVV</label>
+              <input type="text" className="checkout-input" style={INPUT} placeholder="000" maxLength={4} />
+            </FG>
+          </div>
+          <FG>
+            <label style={LABEL}>Name on Card</label>
+            <input type="text" className="checkout-input" style={INPUT} placeholder="Jane Smith" />
+          </FG>
+        </div>
+      </div>
+      <div style={{ paddingTop: "0.5rem" }}>
+        <ContinueButton onClick={onNext} label="Review Order" />
+      </div>
+    </div>
+  );
+}
+
+function ReviewStep() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+      <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.6rem", fontWeight: 300, color: "#111111", marginBottom: "0.25rem" }}>
+        Review &amp; Place Order
+      </h2>
+      <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.75rem", color: "#777777", lineHeight: 1.9 }}>
+        Please review your order before placing. By placing your order you agree to our{" "}
+        <Link href="/terms" style={{ color: "var(--gold-dark)", textDecoration: "none" }}>Terms &amp; Conditions</Link>.
+      </p>
+      <div style={{ paddingTop: "0.5rem" }}>
+        <Link
+          href="/order-confirmation"
+          style={{
+            display: "inline-block",
+            fontFamily: "var(--font-inter)",
+            fontSize: "0.58rem",
+            fontWeight: 600,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "#FFFFFF",
+            background: "#111111",
+            padding: "1rem 2.5rem",
+            textDecoration: "none",
+            transition: "background 0.25s ease",
+          }}
+          onMouseEnter={(e) => ((e.currentTarget as HTMLElement).style.background = "#333333")}
+          onMouseLeave={(e) => ((e.currentTarget as HTMLElement).style.background = "#111111")}
+        >
+          Place Order
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function ContinueButton({ onClick, label }: { onClick: () => void; label: string }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        fontFamily: "var(--font-inter)",
+        fontSize: "0.58rem",
+        fontWeight: 600,
+        letterSpacing: "0.18em",
+        textTransform: "uppercase",
+        color: "#FFFFFF",
+        background: "#111111",
+        border: "none",
+        padding: "1rem 2.5rem",
+        cursor: "pointer",
+        transition: "background 0.25s ease",
+      }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = "#333333")}
+      onMouseLeave={(e) => (e.currentTarget.style.background = "#111111")}
+    >
+      {label} →
+    </button>
+  );
+}

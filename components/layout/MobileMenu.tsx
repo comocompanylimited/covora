@@ -32,7 +32,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
       {/* Backdrop */}
       <div
         className={cn(
-          "fixed inset-0 z-[110] bg-black/65 backdrop-blur-sm transition-opacity duration-500",
+          "fixed inset-0 z-[110] bg-black/30 backdrop-blur-sm transition-opacity duration-500",
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         )}
         onClick={onClose}
@@ -45,7 +45,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
           "transition-transform duration-[520ms] ease-[cubic-bezier(0.4,0,0.2,1)]",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
-        style={{ background: "var(--charcoal)", borderRight: "1px solid var(--border-subtle)" }}
+        style={{ background: "#FFFFFF", borderRight: "1px solid rgba(0,0,0,0.07)" }}
       >
         {/* Header */}
         <div
@@ -53,11 +53,11 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
           style={{
             height: "var(--header-height)",
             padding: "0 1.5rem",
-            borderBottom: "1px solid var(--border-subtle)",
+            borderBottom: "1px solid rgba(0,0,0,0.07)",
           }}
         >
           <Link
-            href="/"
+            href="/home"
             onClick={onClose}
             style={{
               fontFamily: "var(--font-cormorant)",
@@ -65,7 +65,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
               fontWeight: 300,
               letterSpacing: "0.42em",
               textTransform: "uppercase",
-              color: "var(--gold)",
+              color: "var(--gold-dark)",
               textDecoration: "none",
               paddingRight: "0.42em",
             }}
@@ -75,9 +75,9 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
           <button
             onClick={onClose}
             aria-label="Close menu"
-            style={{ color: "var(--warm-grey)", transition: "color var(--transition-fast)" }}
-            onMouseEnter={(e) => (e.currentTarget.style.color = "var(--off-white)")}
-            onMouseLeave={(e) => (e.currentTarget.style.color = "var(--warm-grey)")}
+            style={{ color: "#888888", transition: "color var(--transition-fast)" }}
+            onMouseEnter={(e) => (e.currentTarget.style.color = "#111111")}
+            onMouseLeave={(e) => (e.currentTarget.style.color = "#888888")}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.3">
               <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
@@ -92,7 +92,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
             const isExpanded = expanded === item.label;
 
             return (
-              <div key={item.href} style={{ borderBottom: "1px solid var(--border-subtle)" }}>
+              <div key={item.href} style={{ borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
                 <div className="flex items-center justify-between">
                   <Link
                     href={item.href}
@@ -106,7 +106,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
                       fontFamily:    "var(--font-cormorant)",
                       fontSize:      "clamp(1.4rem, 4vw, 1.7rem)",
                       fontWeight:    300,
-                      color:         "var(--text-primary)",
+                      color:         "#222222",
                       textDecoration:"none",
                       letterSpacing: "0.02em",
                       display:       "block",
@@ -122,7 +122,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
                       onClick={() => setExpanded(isExpanded ? null : item.label)}
                       style={{
                         padding: "1.25rem 1.5rem",
-                        color:   "var(--warm-grey)",
+                        color:   "#AAAAAA",
                         transition: "color var(--transition-fast), transform 0.3s ease",
                         transform: isExpanded ? "rotate(45deg)" : "rotate(0deg)",
                         flexShrink: 0,
@@ -140,8 +140,8 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
                 {hasSub && isExpanded && (
                   <div
                     style={{
-                      background:   "var(--surface-2)",
-                      borderTop:    "1px solid var(--border-subtle)",
+                      background:   "#F7F5F2",
+                      borderTop:    "1px solid rgba(0,0,0,0.06)",
                       padding:      "1.25rem 1.5rem 1.5rem",
                       animation:    "fadeDown 0.25s var(--ease-out-expo) both",
                     }}
@@ -150,7 +150,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
                       <div key={col.heading} style={{ marginBottom: "1.25rem" }}>
                         <p
                           className="label-caps"
-                          style={{ fontSize: "0.5rem", color: "var(--gold)", marginBottom: "0.75rem" }}
+                          style={{ fontSize: "0.5rem", color: "var(--gold-dark)", marginBottom: "0.75rem" }}
                         >
                           {col.heading}
                         </p>
@@ -163,7 +163,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
                               style={{
                                 fontFamily:    "var(--font-inter)",
                                 fontSize:      "0.8rem",
-                                color:         "var(--text-muted)",
+                                color:         "#777777",
                                 textDecoration:"none",
                                 letterSpacing: "0.02em",
                                 padding:       "0.35rem 0",
@@ -186,7 +186,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
         {/* Footer links */}
         <div
           style={{
-            borderTop: "1px solid var(--border-subtle)",
+            borderTop: "1px solid rgba(0,0,0,0.07)",
             padding:   "1.5rem",
             display:   "flex",
             flexDirection: "column",
@@ -197,7 +197,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
             {[
               { label: "Account", href: "/account" },
               { label: "Contact", href: "/contact" },
-              { label: "FAQs",    href: "/faqs" },
+              { label: "FAQs",    href: "/faq" },
             ].map((link) => (
               <Link
                 key={link.href}
@@ -206,7 +206,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
                 className="label-caps"
                 style={{
                   fontSize:      "0.52rem",
-                  color:         "var(--text-muted)",
+                  color:         "#888888",
                   textDecoration:"none",
                   transition:    "color var(--transition-fast)",
                 }}
@@ -217,7 +217,7 @@ export default function MobileMenu({ links, isOpen, onClose }: MobileMenuProps) 
           </div>
           <p
             className="label-caps"
-            style={{ fontSize: "0.48rem", color: "var(--text-muted)", opacity: 0.5 }}
+            style={{ fontSize: "0.48rem", color: "#BBBBBB" }}
           >
             © {new Date().getFullYear()} Covora — Refined Luxury
           </p>

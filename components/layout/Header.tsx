@@ -25,7 +25,7 @@ interface NavItem {
 }
 
 const NAV_LEFT: NavItem[] = [
-  { label: "New In", href: "/new-arrivals" },
+  { label: "New In", href: "/new-in" },
   {
     label: "Clothing",
     href:  "/category/clothing",
@@ -54,7 +54,7 @@ const NAV_LEFT: NavItem[] = [
         },
       ],
       featured: [
-        { label: "New Season", href: "/new-arrivals",  tag: "New" },
+        { label: "New Season", href: "/new-in",       tag: "New" },
         { label: "Bestsellers", href: "/collections",  tag: undefined },
         { label: "Exclusives",  href: "/collections",  tag: "Limited" },
       ],
@@ -89,7 +89,7 @@ const NAV_LEFT: NavItem[] = [
         },
       ],
       featured: [
-        { label: "New Shoes",    href: "/new-arrivals", tag: "New" },
+        { label: "New Shoes",    href: "/new-in",       tag: "New" },
         { label: "Bag Edit",     href: "/collections",  tag: undefined },
         { label: "Jewellery",    href: "/category/jewellery", tag: undefined },
       ],
@@ -100,7 +100,6 @@ const NAV_LEFT: NavItem[] = [
 
 const NAV_RIGHT: NavItem[] = [
   { label: "Collections", href: "/collections" },
-  { label: "Journal",     href: "/journal" },
   { label: "Sale",        href: "/sale" },
 ];
 
@@ -116,7 +115,7 @@ export default function Header() {
   const [searchOpen,  setSearchOpen]  = useState(false);
   const { itemCount, openCart } = useCart();
   const pathname = usePathname();
-  const isLanding = pathname === "/";
+  const isLanding = pathname === "/" || pathname === "/home";
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Suppress header on isolated pages with their own header
@@ -177,10 +176,10 @@ export default function Header() {
           zIndex:       100,
           transition:   "transform 0.5s var(--ease-out-expo), background 0.5s ease, border-color 0.5s ease",
           transform:    isHidden ? "translateY(-100%)" : "translateY(0)",
-          background:   isSolid  ? "rgba(8,8,8,0.95)"  : "transparent",
-          backdropFilter:        isSolid ? "blur(24px) saturate(160%)" : "none",
-          WebkitBackdropFilter:  isSolid ? "blur(24px) saturate(160%)" : "none",
-          borderBottom: `1px solid ${isSolid ? "rgba(201,169,110,0.07)" : "transparent"}`,
+          background:   isSolid  ? "rgba(255,255,255,0.97)"  : "transparent",
+          backdropFilter:        isSolid ? "blur(20px) saturate(140%)" : "none",
+          WebkitBackdropFilter:  isSolid ? "blur(20px) saturate(140%)" : "none",
+          borderBottom: `1px solid ${isSolid ? "rgba(0,0,0,0.08)" : "transparent"}`,
         }}
         onMouseLeave={closeMenu}
       >
@@ -193,37 +192,20 @@ export default function Header() {
             transition: "height 0.5s var(--ease-out-expo)",
           }}
         >
-          {/* Mobile hamburger */}
+          {/* Menu trigger — all breakpoints */}
           <button
-            className="lg:hidden relative z-10 flex flex-col gap-[5px] p-2 -ml-2"
+            className="relative z-10 flex flex-col gap-[5px] p-2 -ml-2"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
           >
-            <span style={{ display: "block", width: "22px", height: "1px", background: "var(--off-white)", transition: "all 0.3s ease" }} />
-            <span style={{ display: "block", width: "14px", height: "1px", background: "var(--gold)",      transition: "all 0.3s ease" }} />
+            <span style={{ display: "block", width: "22px", height: "1px", background: isSolid ? "#333333" : "var(--ivory)", transition: "all 0.3s ease" }} />
+            <span style={{ display: "block", width: "14px", height: "1px", background: isSolid ? "var(--gold-dark)" : "var(--gold)", transition: "all 0.3s ease" }} />
           </button>
-
-          {/* Left nav */}
-          <nav
-            className="hidden lg:flex items-center"
-            style={{ gap: "clamp(1.75rem, 2.5vw, 2.75rem)" }}
-          >
-            {NAV_LEFT.map((item) => (
-              <NavItem
-                key={item.href}
-                item={item}
-                active={pathname.startsWith(item.href) && item.href !== "/"}
-                menuActive={activeMenu === item.label}
-                onEnter={() => openMenu(item.label)}
-                onLeave={closeMenu}
-              />
-            ))}
-          </nav>
 
           {/* Centre logo */}
           <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10">
             <Link
-              href="/"
+              href="/home"
               aria-label="Covora — Home"
               onMouseEnter={() => setActiveMenu(null)}
               style={{
@@ -232,52 +214,41 @@ export default function Header() {
                 fontWeight:    300,
                 letterSpacing: "0.5em",
                 textTransform: "uppercase",
-                color:         "var(--gold)",
+                color:         isSolid ? "var(--gold-dark)" : "var(--gold)",
                 display:       "block",
                 paddingRight:  "0.5em",
                 textDecoration:"none",
                 lineHeight:    1,
                 transition:    "font-size 0.5s var(--ease-out-expo), color 0.3s ease",
               }}
-              className="hover:text-[var(--gold-light)]"
+              className={isSolid ? "hover:text-[var(--gold)]" : "hover:text-[var(--gold-light)]"}
             >
               Covora
             </Link>
           </div>
 
-          {/* Right nav + actions */}
-          <div className="hidden lg:flex items-center ml-auto" style={{ gap: "clamp(1.75rem, 2.5vw, 2.75rem)" }}>
-            {NAV_RIGHT.map((item) => (
-              <NavItem
-                key={item.href}
-                item={item}
-                active={pathname.startsWith(item.href)}
-                menuActive={false}
-                onEnter={() => openMenu(item.label)}
-                onLeave={closeMenu}
-              />
-            ))}
-          </div>
-
           {/* Actions */}
           <div
-            className="flex items-center ml-auto lg:ml-6"
+            className="flex items-center ml-auto"
             style={{ gap: "clamp(0.85rem, 1.4vw, 1.5rem)" }}
             onMouseEnter={() => setActiveMenu(null)}
           >
-            <IconAction label="Search" onClick={() => setSearchOpen(true)}>
+            <IconAction label="Search" onClick={() => setSearchOpen(true)} baseColor={isSolid ? "#666666" : "var(--ivory)"}>
               <SearchIcon />
             </IconAction>
-            <IconAction label="Account" href="/account" className="hidden sm:flex">
+            <IconAction label="Account" href="/account" className="hidden sm:flex" baseColor={isSolid ? "#666666" : "var(--ivory)"}>
               <AccountIcon />
+            </IconAction>
+            <IconAction label="Wishlist" href="/wishlist" className="hidden sm:flex" baseColor={isSolid ? "#666666" : "var(--ivory)"}>
+              <WishlistIcon />
             </IconAction>
             <button
               onClick={openCart}
               aria-label={`Your bag — ${itemCount} item${itemCount !== 1 ? "s" : ""}`}
               className="relative flex items-center justify-center"
-              style={{ color: "var(--warm-grey)", transition: "color var(--transition-fast)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "var(--warm-grey)")}
+              style={{ color: isSolid ? "#666666" : "var(--ivory)", transition: "color var(--transition-fast)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold-dark)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = isSolid ? "#666666" : "var(--ivory)")}
             >
               <BagIcon />
               {itemCount > 0 && (
@@ -435,14 +406,14 @@ function MegaMenu({
                     style={{
                       fontFamily:    "var(--font-inter)",
                       fontSize:      "0.72rem",
-                      color:         "var(--text-muted)",
+                      color:         "#888888",
                       textDecoration:"none",
                       letterSpacing: "0.03em",
                       transition:    "color var(--transition-fast)",
                       display:       "inline-block",
                     }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = "var(--ivory)")}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-muted)")}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = "#111111")}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = "#888888")}
                   >
                     {link.label}
                   </Link>
@@ -454,7 +425,7 @@ function MegaMenu({
 
         {/* Featured column */}
         {mega.featured && (
-          <div style={{ borderLeft: "1px solid var(--border-subtle)", paddingLeft: "2.5rem" }}>
+          <div style={{ borderLeft: "1px solid rgba(0,0,0,0.08)", paddingLeft: "2.5rem" }}>
             <p
               className="label-caps"
               style={{ color: "var(--gold)", fontSize: "0.52rem", marginBottom: "1.25rem" }}
@@ -471,15 +442,15 @@ function MegaMenu({
                     alignItems:     "center",
                     gap:            "0.65rem",
                     textDecoration: "none",
-                    color:          "var(--text-secondary)",
+                    color:          "#555555",
                     fontFamily:     "var(--font-cormorant)",
                     fontSize:       "1.05rem",
                     fontWeight:     300,
                     letterSpacing:  "0.02em",
                     transition:     "color var(--transition-fast)",
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold-light)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = "var(--gold-dark)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = "#555555")}
                 >
                   {item.label}
                   {item.tag && (
@@ -514,19 +485,22 @@ function IconAction({
   onClick,
   children,
   className,
+  baseColor = "var(--warm-grey)",
 }: {
   label:      string;
   href?:      string;
   onClick?:   () => void;
   children:   React.ReactNode;
   className?: string;
+  baseColor?: string;
 }) {
   const style: React.CSSProperties = {
-    color:      "var(--warm-grey)",
+    color:      baseColor,
     transition: "color var(--transition-fast)",
   };
-  const enter = (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--gold)");
-  const leave = (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = "var(--warm-grey)");
+  const hoverColor = "var(--gold-dark)";
+  const enter = (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = hoverColor);
+  const leave = (e: React.MouseEvent<HTMLElement>) => (e.currentTarget.style.color = baseColor);
 
   if (href) {
     return (
@@ -588,8 +562,8 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
           position:       "fixed",
           inset:          0,
           zIndex:         98,
-          background:     "rgba(0,0,0,0.5)",
-          backdropFilter: "blur(3px)",
+          background:     "rgba(0,0,0,0.2)",
+          backdropFilter: "blur(2px)",
           opacity:        open ? 1 : 0,
           pointerEvents:  open ? "auto" : "none",
           transition:     "opacity 0.35s ease",
@@ -609,18 +583,19 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
       >
         <div
           style={{
-            background:   "rgba(6,6,6,0.98)",
-            borderBottom: "1px solid var(--border-dark)",
+            background:   "#FFFFFF",
+            borderBottom: "1px solid rgba(0,0,0,0.07)",
             paddingTop:   "96px",
             paddingBottom:"3.5rem",
             paddingLeft:  "clamp(1.5rem, 6vw, 8rem)",
             paddingRight: "clamp(1.5rem, 6vw, 8rem)",
+            boxShadow:    "0 8px 40px rgba(0,0,0,0.08)",
           }}
         >
           <div style={{ maxWidth: "860px" }}>
             {/* Header */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "3rem" }}>
-              <span className="label-caps" style={{ fontSize: "0.48rem", letterSpacing: "0.42em", color: "rgba(201,169,110,0.45)" }}>
+              <span className="label-caps" style={{ fontSize: "0.48rem", letterSpacing: "0.42em", color: "rgba(154,117,64,0.5)" }}>
                 Search Covora
               </span>
               <button
@@ -628,12 +603,12 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
                 style={{
                   display: "flex", alignItems: "center", gap: "0.5rem",
                   background: "none", border: "none", cursor: "pointer",
-                  color: "var(--warm-grey)", fontFamily: "var(--font-inter)",
+                  color: "#999999", fontFamily: "var(--font-inter)",
                   fontSize: "0.48rem", letterSpacing: "0.22em", textTransform: "uppercase",
                   transition: "color 0.2s ease", padding: 0,
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--off-white)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--warm-grey)")}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "#111111")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "#999999")}
               >
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.1">
                   <path d="M1 1l8 8M9 1L1 9" strokeLinecap="round" />
@@ -643,7 +618,7 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
             </div>
             {/* Input */}
             <form onSubmit={handleSubmit}>
-              <div style={{ position: "relative", borderBottom: `1px solid ${query ? "rgba(201,169,110,0.38)" : "rgba(201,169,110,0.12)"}`, paddingBottom: "1rem", transition: "border-color 0.3s ease" }}>
+              <div style={{ position: "relative", borderBottom: `1px solid ${query ? "rgba(154,117,64,0.5)" : "rgba(0,0,0,0.12)"}`, paddingBottom: "1rem", transition: "border-color 0.3s ease" }}>
                 <input
                   ref={inputRef}
                   value={query}
@@ -652,7 +627,7 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
                   style={{
                     width: "100%", background: "transparent", border: "none", outline: "none",
                     fontFamily: "var(--font-cormorant)", fontSize: "clamp(2rem, 4.5vw, 4rem)",
-                    fontWeight: 300, color: "var(--ivory)", caretColor: "rgba(201,169,110,0.8)",
+                    fontWeight: 300, color: "#111111", caretColor: "rgba(154,117,64,0.8)",
                     lineHeight: 1, letterSpacing: "-0.01em",
                   }}
                 />
@@ -664,7 +639,7 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
                     style={{
                       position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)",
                       background: "none", border: "none", cursor: "pointer",
-                      color: "var(--warm-grey)", padding: "0.3rem",
+                      color: "#AAAAAA", padding: "0.3rem",
                     }}
                   >
                     <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.2">
@@ -673,11 +648,11 @@ function SearchOverlay({ open, onClose }: { open: boolean; onClose: () => void }
                   </button>
                 )}
               </div>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "1.25rem", opacity: 0.55 }}>
-                <span className="label-caps" style={{ fontSize: "0.42rem", color: "var(--warm-grey)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "1.25rem" }}>
+                <span className="label-caps" style={{ fontSize: "0.42rem", color: "#AAAAAA" }}>
                   {query ? "↵ to search" : "Start typing to search"}
                 </span>
-                <span className="label-caps" style={{ fontSize: "0.42rem", color: "var(--warm-grey)" }}>
+                <span className="label-caps" style={{ fontSize: "0.42rem", color: "#AAAAAA" }}>
                   Esc to close
                 </span>
               </div>
@@ -705,6 +680,14 @@ function AccountIcon() {
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25">
       <path d="M20 21v-1.5a4.5 4.5 0 0 0-4.5-4.5h-7A4.5 4.5 0 0 0 4 19.5V21" />
       <circle cx="12" cy="7" r="4" />
+    </svg>
+  );
+}
+
+function WishlistIcon() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.25">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
     </svg>
   );
 }

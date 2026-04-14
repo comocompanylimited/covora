@@ -8,7 +8,7 @@
  *   WC_CONSUMER_SECRET       = cs_xxxxx
  */
 
-const WC_BASE_URL = process.env.NEXT_PUBLIC_WC_URL ?? "http://localhost:8080";
+const WC_BASE_URL = process.env.NEXT_PUBLIC_WC_URL ?? "https://comodo-backend.zeabur.app";
 const WC_KEY = process.env.WC_CONSUMER_KEY ?? "";
 const WC_SECRET = process.env.WC_CONSUMER_SECRET ?? "";
 

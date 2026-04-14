@@ -1,75 +1,90 @@
-import { cn } from "@/lib/utils";
-import type { ReactNode } from "react";
+import type { ReactNode, ElementType } from "react";
+
+// ─── Shared helper ────────────────────────────────────────────────────────────
+
+function cls(...parts: (string | false | undefined | null)[]) {
+  return parts.filter(Boolean).join(" ");
+}
 
 // ─── Container ────────────────────────────────────────────────────────────────
+// Max-width wrapper with responsive horizontal padding.
 
-interface ContainerProps {
+export type ContainerSize = "sm" | "md" | "wide" | "full";
+
+export interface ContainerProps {
   children:   ReactNode;
-  size?:      "sm" | "md" | "wide" | "full";
+  size?:      ContainerSize;
+  as?:        ElementType;
   className?: string;
-  as?:        "div" | "section" | "article" | "main" | "aside";
 }
+
+const SIZE_CLASS: Record<ContainerSize, string> = {
+  sm:   "container-sm",
+  md:   "container-md",
+  wide: "container-wide",
+  full: "container",
+};
 
 export function Container({
   children,
   size     = "wide",
-  className,
   as: Tag  = "div",
+  className,
 }: ContainerProps) {
-  const sizeClass =
-    size === "sm"   ? "container-sm"   :
-    size === "md"   ? "container-md"   :
-    size === "wide" ? "container-wide" :
-    "container";
-
   return (
-    <Tag className={cn(sizeClass, className)}>
+    <Tag className={cls(SIZE_CLASS[size], className)}>
       {children}
     </Tag>
   );
 }
 
 // ─── Section ─────────────────────────────────────────────────────────────────
+// Vertical-rhythm section wrapper. Optionally nests a Container.
 
-interface SectionProps {
+export type SectionSpacing = "xs" | "sm" | "md" | "lg" | "xl" | "none";
+
+export interface SectionProps {
   children:    ReactNode;
-  spacing?:    "xs" | "sm" | "md" | "lg" | "xl" | "none";
-  container?:  "sm" | "md" | "wide" | "full" | false;
-  className?:  string;
+  spacing?:    SectionSpacing;
+  container?:  ContainerSize | false;
+  as?:         ElementType;
   id?:         string;
-  as?:         "section" | "div" | "article";
+  className?:  string;
 }
+
+const SPACING_CLASS: Record<SectionSpacing, string> = {
+  xs:   "section-xs",
+  sm:   "section-sm",
+  md:   "section-md",
+  lg:   "section-lg",
+  xl:   "section-xl",
+  none: "",
+};
 
 export function Section({
   children,
   spacing   = "md",
   container = "wide",
-  className,
-  id,
   as: Tag   = "section",
+  id,
+  className,
 }: SectionProps) {
-  const spacingClass =
-    spacing === "xs"   ? "section-xs"  :
-    spacing === "sm"   ? "section-sm"  :
-    spacing === "md"   ? "section-md"  :
-    spacing === "lg"   ? "section-lg"  :
-    spacing === "xl"   ? "section-xl"  :
-    "";
-
-  const content = container === false
-    ? children
-    : <Container size={container}>{children}</Container>;
+  const inner =
+    container === false
+      ? children
+      : <Container size={container}>{children}</Container>;
 
   return (
-    <Tag id={id} className={cn(spacingClass, className)}>
-      {content}
+    <Tag id={id} className={cls(SPACING_CLASS[spacing], className)}>
+      {inner}
     </Tag>
   );
 }
 
 // ─── SectionHeader ───────────────────────────────────────────────────────────
+// Reusable eyebrow + title + subtitle block.
 
-interface SectionHeaderProps {
+export interface SectionHeaderProps {
   eyebrow?:   string;
   title:      string;
   subtitle?:  string;
@@ -84,23 +99,41 @@ export function SectionHeader({
   align     = "left",
   className,
 }: SectionHeaderProps) {
-  const alignClass =
-    align === "center" ? "text-center items-center" :
-    align === "right"  ? "text-right items-end"     :
-    "text-left items-start";
+  const alignStyle: React.CSSProperties =
+    align === "center" ? { textAlign: "center", alignItems: "center" }  :
+    align === "right"  ? { textAlign: "right",  alignItems: "flex-end" } :
+    { textAlign: "left", alignItems: "flex-start" };
 
   return (
-    <div className={cn("flex flex-col gap-3 mb-12 lg:mb-16", alignClass, className)}>
+    <div
+      className={cls("section-header", align === "center" ? "center" : undefined, className)}
+      style={{ display: "flex", flexDirection: "column", gap: "0.75rem", ...alignStyle }}
+    >
       {eyebrow && (
-        <p className="label-caps text-[var(--gold)]" style={{ fontSize: "0.58rem" }}>
+        <p
+          style={{
+            fontFamily:    "var(--font-inter)",
+            fontSize:      "0.58rem",
+            fontWeight:    500,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+            color:         "var(--gold)",
+          }}
+        >
           {eyebrow}
         </p>
       )}
       <h2 className="heading-lg">{title}</h2>
       {subtitle && (
         <p
-          className="body-lg max-w-xl"
-          style={{ color: "var(--text-muted)", marginTop: "0.25rem" }}
+          style={{
+            fontFamily: "var(--font-inter)",
+            fontSize:   "clamp(0.85rem, 1vw, 1rem)",
+            color:      "var(--text-muted)",
+            lineHeight: 1.7,
+            maxWidth:   "38rem",
+            marginTop:  "0.25rem",
+          }}
         >
           {subtitle}
         </p>
@@ -110,22 +143,26 @@ export function SectionHeader({
 }
 
 // ─── Grid ─────────────────────────────────────────────────────────────────────
+// Responsive CSS grid with preset column counts and gap sizes.
 
-interface GridProps {
+export type GridCols = 2 | 3 | 4 | 5;
+export type GridGap  = "sm" | "md" | "lg";
+
+export interface GridProps {
   children:   ReactNode;
-  cols?:      2 | 3 | 4 | 5;
-  gap?:       "sm" | "md" | "lg";
+  cols?:      GridCols;
+  gap?:       GridGap;
   className?: string;
 }
 
-const colClasses: Record<number, string> = {
+const COL_CLASS: Record<GridCols, string> = {
   2: "grid-cols-1 sm:grid-cols-2",
   3: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3",
   4: "grid-cols-2 sm:grid-cols-2 lg:grid-cols-4",
   5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
 };
 
-const gapClasses: Record<string, string> = {
+const GAP_CLASS: Record<GridGap, string> = {
   sm: "gap-4",
   md: "gap-6 lg:gap-8",
   lg: "gap-8 lg:gap-12",
@@ -133,37 +170,30 @@ const gapClasses: Record<string, string> = {
 
 export function Grid({ children, cols = 4, gap = "md", className }: GridProps) {
   return (
-    <div className={cn("grid", colClasses[cols], gapClasses[gap], className)}>
+    <div className={cls("grid", COL_CLASS[cols], GAP_CLASS[gap], className)}>
       {children}
     </div>
   );
 }
 
-// ─── Divider ─────────────────────────────────────────────────────────────────
+// ─── PageWrapper ──────────────────────────────────────────────────────────────
+// Top-level page layout — adds header-offset padding and optional max-width.
 
-interface DividerProps {
-  variant?:   "subtle" | "default" | "gold";
+export interface PageWrapperProps {
+  children:   ReactNode;
+  container?: ContainerSize | false;
   className?: string;
-  spacing?:   "none" | "sm" | "md" | "lg";
 }
 
-export function Divider({ variant = "default", className, spacing = "none" }: DividerProps) {
-  const spacingClass =
-    spacing === "sm" ? "my-6" :
-    spacing === "md" ? "my-10" :
-    spacing === "lg" ? "my-16" :
-    "";
+export function PageWrapper({ children, container = "wide", className }: PageWrapperProps) {
+  const inner =
+    container === false
+      ? children
+      : <Container size={container}>{children}</Container>;
 
   return (
-    <div
-      className={cn(
-        "divider",
-        variant === "subtle"  ? "divider-subtle"  :
-        variant === "gold"    ? "divider-gold"    :
-        "divider-default",
-        spacingClass,
-        className
-      )}
-    />
+    <main className={cls("page-with-header", className)}>
+      {inner}
+    </main>
   );
 }

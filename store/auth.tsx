@@ -1,14 +1,8 @@
 "use client"
 
 // ─── Auth Store ───────────────────────────────────────────────────────────────
-// Scaffold implementation using localStorage for session persistence.
-//
-// TO CONNECT REAL AUTH:
-//   1. Replace `mockLogin` / `mockSignUp` with real API calls
-//      e.g. NextAuth signIn(), Supabase auth.signInWithPassword(), WooCommerce JWT, etc.
-//   2. Replace localStorage reads/writes with server session handling
-//   3. Keep all exported types and the useAuth() hook signature unchanged —
-//      consumer components will not need to change.
+// Session persistence via localStorage.
+// Auth calls go to the live backend via lib/api/auth.ts.
 //
 // Data stored:
 //   covora-user      → serialised User object (session)
@@ -31,6 +25,7 @@ import type {
   Address,
   SavedItem,
 } from "@/types/account"
+import { apiLogin, apiSignUp } from "@/lib/api/auth"
 
 // ─── Storage keys ─────────────────────────────────────────────────────────────
 
@@ -55,41 +50,6 @@ function clearStorage(...keys: string[]): void {
   try { keys.forEach((k) => localStorage.removeItem(k)) } catch { /* noop */ }
 }
 
-// ─── Mock API calls ───────────────────────────────────────────────────────────
-// Replace these with real network requests when backend is ready.
-
-async function mockLogin(payload: LoginPayload): Promise<User> {
-  await new Promise((r) => setTimeout(r, 800)) // simulate latency
-
-  // SCAFFOLD: in production, POST /api/auth/login and validate server-side
-  const existing = readStorage<User>(USER_KEY)
-  if (existing && existing.email === payload.email) return existing
-
-  // Create a minimal user from email for demo purposes
-  const [localPart] = payload.email.split("@")
-  const user: User = {
-    id: `u_${Date.now()}`,
-    email: payload.email,
-    firstName: localPart.charAt(0).toUpperCase() + localPart.slice(1),
-    lastName: "",
-    createdAt: new Date().toISOString(),
-  }
-  return user
-}
-
-async function mockSignUp(payload: SignUpPayload): Promise<User> {
-  await new Promise((r) => setTimeout(r, 900)) // simulate latency
-
-  // SCAFFOLD: in production, POST /api/auth/register
-  const user: User = {
-    id: `u_${Date.now()}`,
-    email: payload.email,
-    firstName: payload.firstName,
-    lastName: payload.lastName,
-    createdAt: new Date().toISOString(),
-  }
-  return user
-}
 
 // ─── Context ──────────────────────────────────────────────────────────────────
 
@@ -136,7 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (payload: LoginPayload) => {
     setIsLoading(true)
-    const loggedIn = await mockLogin(payload)
+    const loggedIn = await apiLogin(payload)
     writeStorage(USER_KEY, loggedIn)
     setUser(loggedIn)
     setIsLoading(false)
@@ -144,7 +104,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = useCallback(async (payload: SignUpPayload) => {
     setIsLoading(true)
-    const created = await mockSignUp(payload)
+    const created = await apiSignUp(payload)
     writeStorage(USER_KEY, created)
     setUser(created)
     setIsLoading(false)

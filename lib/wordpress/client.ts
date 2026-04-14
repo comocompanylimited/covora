@@ -6,7 +6,7 @@
  *   NEXT_PUBLIC_WP_URL = https://your-wordpress-site.com
  */
 
-const WP_BASE_URL = process.env.NEXT_PUBLIC_WP_URL ?? "http://localhost:8080";
+const WP_BASE_URL = process.env.NEXT_PUBLIC_WP_URL ?? "https://comodo-backend.zeabur.app";
 
 export async function wpFetch<T>(
   endpoint: string,

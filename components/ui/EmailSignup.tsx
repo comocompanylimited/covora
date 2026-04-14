@@ -40,7 +40,7 @@ export default function EmailSignup({
           outline:     "none",
           fontFamily:  "var(--font-inter)",
           fontSize:    "0.78rem",
-          color:       "var(--text-primary)",
+          color:       "#111111",
           padding:     "0.75rem 0",
           letterSpacing:"0.03em",
         }}

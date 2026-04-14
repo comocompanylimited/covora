@@ -29,7 +29,7 @@ export default function LuxuryFooter() {
 
         {/* ── Brand column ─────────────────────────────────────── */}
         <div>
-          <Link href="/" style={{ textDecoration: "none", display: "inline-block", marginBottom: "1.6rem" }}>
+          <Link href="/home" style={{ textDecoration: "none", display: "inline-block", marginBottom: "1.6rem" }}>
             <div
               style={{
                 fontFamily: "var(--font-cormorant)",
