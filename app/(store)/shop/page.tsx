@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export default async function ShopPage() {
-  const products = await fetchProducts();
+  const products = await fetchProducts({ limit: 20 });
   return (
     <ShopClient
       products={products}

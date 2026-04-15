@@ -2,7 +2,7 @@
 
 import type { LoginPayload, SignUpPayload, User } from "@/types/account"
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://comodo-backend.zeabur.app"
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "https://covorabackend.zeabur.app"
 
 const TOKEN_KEY = "covora-auth-token"
 

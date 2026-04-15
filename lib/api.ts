@@ -1,6 +1,6 @@
 // ─── Central API config ───────────────────────────────────────────────────────
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://comodo-backend.zeabur.app"
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "https://covorabackend.zeabur.app") + "/api/v1"
 
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const res = await fetch(`${API_BASE}${path}`, {
