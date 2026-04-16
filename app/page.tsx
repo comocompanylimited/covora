@@ -41,7 +41,7 @@ export default function EntryPage() {
           pointerEvents:  "none",
         }}
       >
-        <source src="/videos/women.mp4" type="video/mp4" />
+        <source src="https://pub-98b9c2a87ab54dd9924de5af1f2e080e.r2.dev/womens.mp4" type="video/mp4" />
       </video>
 
       {/* Cinematic overlay — deep dark scrim so glass card reads clearly */}
