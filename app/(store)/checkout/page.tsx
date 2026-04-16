@@ -14,6 +14,8 @@ const STEPS: { id: Step; label: string }[] = [
   { id: "review",   label: "Review" },
 ];
 
+// ─── Shared styles ────────────────────────────────────────────────────────────
+
 const INPUT_BASE: React.CSSProperties = {
   width: "100%", background: "#FFFFFF", borderRadius: 0,
   padding: "0.75rem 0.85rem", fontFamily: "var(--font-inter)",
@@ -42,10 +44,21 @@ function FG({ children }: { children: React.ReactNode }) {
   return <div style={{ display: "flex", flexDirection: "column" }}>{children}</div>;
 }
 
+// ─── Shared form state types ──────────────────────────────────────────────────
+
+interface ContactData { firstName: string; lastName: string; email: string; phone: string; }
+interface ShippingData { address: string; address2: string; city: string; postcode: string; country: string; }
+
+// ─── Checkout ─────────────────────────────────────────────────────────────────
+
 export default function CheckoutPage() {
   const { items, subtotal } = useCart();
   const [step, setStep] = useState<Step>("contact");
   const currentIndex = STEPS.findIndex((s) => s.id === step);
+
+  // Lifted state so ReviewStep can read it for the POST
+  const [contactData, setContactData] = useState<ContactData>({ firstName: "", lastName: "", email: "", phone: "" });
+  const [shippingData, setShippingData] = useState<ShippingData>({ address: "", address2: "", city: "", postcode: "", country: "United Kingdom" });
 
   if (items.length === 0) {
     return (
@@ -86,10 +99,27 @@ export default function CheckoutPage() {
           </div>
 
           <div style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)", padding: "clamp(1.5rem,3vw,2.5rem)" }}>
-            {step === "contact"  && <ContactStep  onNext={() => setStep("shipping")} />}
-            {step === "shipping" && <ShippingStep onNext={() => setStep("payment")} />}
-            {step === "payment"  && <PaymentStep  onNext={() => setStep("review")} />}
-            {step === "review"   && <ReviewStep />}
+            {step === "contact" && (
+              <ContactStep
+                initial={contactData}
+                onNext={(data) => { setContactData(data); setStep("shipping"); }}
+              />
+            )}
+            {step === "shipping" && (
+              <ShippingStep
+                initial={shippingData}
+                onNext={(data) => { setShippingData(data); setStep("payment"); }}
+              />
+            )}
+            {step === "payment" && <PaymentStep onNext={() => setStep("review")} />}
+            {step === "review" && (
+              <ReviewStep
+                contact={contactData}
+                shipping={shippingData}
+                items={items}
+                subtotal={subtotal}
+              />
+            )}
           </div>
         </div>
 
@@ -97,14 +127,12 @@ export default function CheckoutPage() {
         <div style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)", padding: "2rem", position: "sticky", top: "calc(var(--header-height) + 2rem)" }}>
           <div style={{ height: "2px", background: "var(--gold)", marginBottom: "1.5rem" }} />
           <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.52rem", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "#888888", marginBottom: "1.5rem" }}>Order Summary</p>
-
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
             {items.map((item) => (
               <div key={item.id} style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
                 <div>
                   <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#333333", lineHeight: 1.4 }}>
-                    {item.name}
-                    {item.quantity > 1 && <span style={{ color: "#AAAAAA", marginLeft: "0.4rem" }}>×{item.quantity}</span>}
+                    {item.name}{item.quantity > 1 && <span style={{ color: "#AAAAAA", marginLeft: "0.4rem" }}>×{item.quantity}</span>}
                   </p>
                   {Object.keys(item.selectedAttributes).length > 0 && (
                     <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.62rem", color: "#AAAAAA" }}>
@@ -112,13 +140,10 @@ export default function CheckoutPage() {
                     </p>
                   )}
                 </div>
-                <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "0.95rem", color: "#333333", flexShrink: 0 }}>
-                  {formatPrice(item.price * item.quantity)}
-                </span>
+                <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "0.95rem", color: "#333333", flexShrink: 0 }}>{formatPrice(item.price * item.quantity)}</span>
               </div>
             ))}
           </div>
-
           <div style={{ height: "1px", background: "rgba(0,0,0,0.07)", marginBottom: "1.25rem" }} />
           <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginBottom: "1.25rem" }}>
             <div style={{ display: "flex", justifyContent: "space-between" }}>
@@ -149,11 +174,11 @@ export default function CheckoutPage() {
 
 // ─── Contact step ─────────────────────────────────────────────────────────────
 
-function ContactStep({ onNext }: { onNext: () => void }) {
-  const [f, setF] = useState({ firstName: "", lastName: "", email: "", phone: "" });
+function ContactStep({ initial, onNext }: { initial: ContactData; onNext: (d: ContactData) => void }) {
+  const [f, setF] = useState(initial);
   const [e, setE] = useState<Record<string, string>>({});
 
-  function set(k: keyof typeof f, v: string) {
+  function set(k: keyof ContactData, v: string) {
     setF((p) => ({ ...p, [k]: v }));
     if (e[k]) setE((p) => ({ ...p, [k]: "" }));
   }
@@ -165,7 +190,7 @@ function ContactStep({ onNext }: { onNext: () => void }) {
     if (!f.email.trim())     errs.email     = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(f.email)) errs.email = "Enter a valid email address";
     if (Object.keys(errs).length) { setE(errs); return; }
-    onNext();
+    onNext(f);
   }
 
   return (
@@ -201,11 +226,11 @@ function ContactStep({ onNext }: { onNext: () => void }) {
 
 // ─── Shipping step ────────────────────────────────────────────────────────────
 
-function ShippingStep({ onNext }: { onNext: () => void }) {
-  const [f, setF] = useState({ address: "", address2: "", city: "", postcode: "", country: "United Kingdom" });
+function ShippingStep({ initial, onNext }: { initial: ShippingData; onNext: (d: ShippingData) => void }) {
+  const [f, setF] = useState(initial);
   const [e, setE] = useState<Record<string, string>>({});
 
-  function set(k: keyof typeof f, v: string) {
+  function set(k: keyof ShippingData, v: string) {
     setF((p) => ({ ...p, [k]: v }));
     if (e[k]) setE((p) => ({ ...p, [k]: "" }));
   }
@@ -216,7 +241,7 @@ function ShippingStep({ onNext }: { onNext: () => void }) {
     if (!f.city.trim())     errs.city     = "City is required";
     if (!f.postcode.trim()) errs.postcode = "Postcode is required";
     if (Object.keys(errs).length) { setE(errs); return; }
-    onNext();
+    onNext(f);
   }
 
   return (
@@ -249,7 +274,6 @@ function ShippingStep({ onNext }: { onNext: () => void }) {
           {["United Kingdom","United States","France","Germany","Australia","Canada","UAE","Singapore"].map((c) => <option key={c}>{c}</option>)}
         </select>
       </FG>
-
       <div style={{ paddingTop: "0.25rem" }}>
         <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.52rem", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "var(--gold-dark)", marginBottom: "0.85rem" }}>Shipping Method</p>
         <div style={{ display: "flex", flexDirection: "column", gap: "0.65rem" }}>
@@ -273,7 +297,6 @@ function ShippingStep({ onNext }: { onNext: () => void }) {
           ))}
         </div>
       </div>
-
       <div style={{ paddingTop: "0.5rem" }}>
         <ProceedButton onClick={handleNext} label="Proceed to Payment" />
       </div>
@@ -344,21 +367,146 @@ function PaymentStep({ onNext }: { onNext: () => void }) {
   );
 }
 
-// ─── Review step ──────────────────────────────────────────────────────────────
+// ─── Review step (Stripe redirect) ────────────────────────────────────────────
 
-function ReviewStep() {
+interface ReviewProps {
+  contact: ContactData;
+  shipping: ShippingData;
+  items: { id: string; name: string; slug: string; price: number; quantity: number; sku: string; selectedAttributes: Record<string, string> }[];
+  subtotal: number;
+}
+
+function ReviewStep({ contact, shipping, items, subtotal }: ReviewProps) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError]     = useState("");
+
+  const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "https://covorabackend.zeabur.app";
+
+  async function handlePlaceOrder() {
+    setLoading(true);
+    setError("");
+    try {
+      const res = await fetch(`${API_BASE}/api/v1/checkout/session`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          customer: {
+            name:  `${contact.firstName} ${contact.lastName}`.trim(),
+            email: contact.email,
+            phone: contact.phone,
+          },
+          shipping: {
+            address:  shipping.address,
+            address2: shipping.address2,
+            city:     shipping.city,
+            postcode: shipping.postcode,
+            country:  shipping.country,
+          },
+          items: items.map((item) => ({
+            id:         item.id,
+            name:       item.name,
+            slug:       item.slug,
+            sku:        item.sku,
+            price:      item.price,
+            quantity:   item.quantity,
+            attributes: item.selectedAttributes,
+          })),
+          subtotal,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { detail?: string }).detail ?? "Payment session failed. Please try again.");
+      }
+
+      const data = await res.json() as { url: string };
+      if (!data.url) throw new Error("Invalid response from payment server.");
+      window.location.href = data.url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setLoading(false);
+    }
+  }
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
       <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.6rem", fontWeight: 300, color: "#111111" }}>Review &amp; Place Order</h2>
-      <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.75rem", color: "#777777", lineHeight: 1.9 }}>
-        Please review your order before placing. By placing your order you agree to our{" "}
-        <Link href="/terms" style={{ color: "var(--gold-dark)", textDecoration: "none" }}>Terms &amp; Conditions</Link>.
-      </p>
-      <div style={{ paddingTop: "0.5rem" }}>
-        <Link href="/order-confirmation" style={{ display: "inline-block", fontFamily: "var(--font-inter)", fontSize: "0.58rem", fontWeight: 600, letterSpacing: "0.18em", textTransform: "uppercase", color: "#FFFFFF", background: "#111111", padding: "1rem 2.5rem", textDecoration: "none" }}>
-          Place Order →
-        </Link>
+
+      {/* Summary rows */}
+      <div style={{ border: "1px solid rgba(0,0,0,0.07)", padding: "1.25rem", display: "flex", flexDirection: "column", gap: "0.85rem" }}>
+        <Row label="Name"     value={`${contact.firstName} ${contact.lastName}`} />
+        <Row label="Email"    value={contact.email} />
+        <Row label="Address"  value={[shipping.address, shipping.address2, shipping.city, shipping.postcode, shipping.country].filter(Boolean).join(", ")} />
+        <div style={{ height: "1px", background: "rgba(0,0,0,0.06)" }} />
+        {items.map((item) => (
+          <div key={item.id} style={{ display: "flex", justifyContent: "space-between" }}>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#555555" }}>
+              {item.name}{item.quantity > 1 && <span style={{ color: "#AAAAAA" }}> ×{item.quantity}</span>}
+            </span>
+            <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "0.9rem", color: "#111111" }}>
+              {formatPrice(item.price * item.quantity)}
+            </span>
+          </div>
+        ))}
+        <div style={{ height: "1px", background: "rgba(0,0,0,0.06)" }} />
+        <div style={{ display: "flex", justifyContent: "space-between" }}>
+          <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", fontWeight: 600, color: "#111111" }}>Total</span>
+          <span style={{ fontFamily: "var(--font-cormorant)", fontSize: "1rem", color: "#111111" }}>{formatPrice(subtotal)}</span>
+        </div>
       </div>
+
+      <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#777777", lineHeight: 1.8 }}>
+        By placing your order you agree to our{" "}
+        <Link href="/terms" style={{ color: "var(--gold-dark)", textDecoration: "none" }}>Terms &amp; Conditions</Link>.
+        You will be redirected to Stripe&rsquo;s secure payment page.
+      </p>
+
+      {/* Error message */}
+      {error && (
+        <div style={{ padding: "0.85rem 1rem", border: "1px solid #C0392B", background: "rgba(192,57,43,0.04)" }}>
+          <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#C0392B", lineHeight: 1.6 }}>{error}</p>
+        </div>
+      )}
+
+      {/* CTA */}
+      <div style={{ paddingTop: "0.25rem" }}>
+        <button
+          onClick={handlePlaceOrder}
+          disabled={loading}
+          style={{
+            fontFamily: "var(--font-inter)", fontSize: "0.58rem", fontWeight: 600,
+            letterSpacing: "0.18em", textTransform: "uppercase",
+            color: "#FFFFFF", background: loading ? "#666666" : "#111111",
+            border: "none", padding: "1rem 2.5rem", cursor: loading ? "not-allowed" : "pointer",
+            transition: "background 0.25s ease", display: "flex", alignItems: "center", gap: "0.6rem",
+          }}
+          onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = "#333333"; }}
+          onMouseLeave={(e) => { if (!loading) e.currentTarget.style.background = "#111111"; }}
+        >
+          {loading ? (
+            <>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ animation: "spin 0.8s linear infinite" }}>
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" strokeLinecap="round" />
+              </svg>
+              Redirecting to secure payment...
+            </>
+          ) : (
+            "Place Order →"
+          )}
+        </button>
+      </div>
+
+      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+  );
+}
+
+function Row({ label, value }: { label: string; value: string }) {
+  return (
+    <div style={{ display: "flex", gap: "1rem" }}>
+      <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.58rem", fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "#AAAAAA", minWidth: "70px", flexShrink: 0 }}>{label}</span>
+      <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#333333" }}>{value}</span>
     </div>
   );
 }
