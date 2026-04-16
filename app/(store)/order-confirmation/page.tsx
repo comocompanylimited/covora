@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
@@ -76,7 +76,7 @@ function Row({ label, value }: { label: string; value: string }) {
   );
 }
 
-export default function OrderConfirmationPage() {
+function OrderConfirmationInner() {
   const params = useSearchParams();
   const sessionId = params.get("session_id");
 
@@ -197,5 +197,13 @@ export default function OrderConfirmationPage() {
         .oc-btn-primary:hover { background: #333333; }
       `}</style>
     </div>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <OrderConfirmationInner />
+    </Suspense>
   );
 }

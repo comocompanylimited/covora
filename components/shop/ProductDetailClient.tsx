@@ -1,11 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ProductCard } from "@/components/ui/Card";
 import type { Product as MockProduct } from "@/lib/api";
 import { useCart } from "@/store/cart";
+
+// Safe description renderer — strips HTML tags, normalises whitespace
+function useCleanDescription(raw: string) {
+  return useMemo(() => {
+    if (!raw) return "";
+    // Strip HTML tags
+    const stripped = raw.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"');
+    // Collapse whitespace
+    return stripped.replace(/\s+/g, " ").trim();
+  }, [raw]);
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -83,6 +94,7 @@ export function ProductDetailClient({ product, related }: Props) {
 
   const { addItem } = useCart();
   const hasSale = !!product.originalPrice;
+  const cleanDescription = useCleanDescription(product.description);
 
   function handleAddToCart() {
     if (!activeSize && product.sizes.length > 1) {
@@ -205,6 +217,16 @@ export function ProductDetailClient({ product, related }: Props) {
                   transition: "background 0.35s ease",
                   border: "1px solid rgba(0,0,0,0.07)",
                 }}>
+                  {!product.images[activeImg]?.src && (
+                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "0.9rem" }}>
+                      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.3)" strokeWidth="0.7">
+                        <rect x="3" y="3" width="18" height="18" rx="1" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <path d="m21 15-5-5L5 21" />
+                      </svg>
+                      <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.5rem", letterSpacing: "0.28em", textTransform: "uppercase", color: "rgba(201,169,110,0.35)" }}>Covora</span>
+                    </div>
+                  )}
                   {product.images[activeImg]?.src && (
                     <Image
                       src={product.images[activeImg].src!}
@@ -347,7 +369,7 @@ export function ProductDetailClient({ product, related }: Props) {
               fontFamily: "var(--font-inter)", fontSize: "0.76rem",
               color: "#5A5A5A", lineHeight: 1.8, marginBottom: "1.75rem",
             }}>
-              {product.description}
+              {cleanDescription}
             </p>
 
             {/* ── Colour ──────────────────────────────────────────── */}
