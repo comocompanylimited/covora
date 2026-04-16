@@ -1,3 +1,6 @@
+// ─── Static fallback (used when live API is unavailable) ────────────────────
+import { STATIC_PRODUCTS } from "@/lib/static-products";
+
 // ─── Central API config ───────────────────────────────────────────────────────
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL ?? "https://covorabackend.zeabur.app") + "/api/v1"
@@ -214,19 +217,21 @@ export async function fetchProducts(params: { limit?: number; sort?: string } = 
   const query = qs.toString()
   try {
     const data = await apiFetch(`/products${query ? `?${query}` : ""}`)
-    return unwrap(data).map(normalizeProduct)
-  } catch {
-    return []
-  }
+    const products = unwrap(data).map(normalizeProduct)
+    if (products.length > 0) return products
+  } catch { /* fall through to static */ }
+  // API unavailable or returned empty — serve static catalogue
+  const limit = params.limit ?? STATIC_PRODUCTS.length
+  return STATIC_PRODUCTS.slice(0, limit)
 }
 
 export async function fetchNewIn(): Promise<Product[]> {
   try {
     const data = await apiFetch("/products?tag=new")
-    return unwrap(data).map(normalizeProduct)
-  } catch {
-    return []
-  }
+    const products = unwrap(data).map(normalizeProduct)
+    if (products.length > 0) return products
+  } catch { /* fall through */ }
+  return STATIC_PRODUCTS.filter((p) => p.badge === "New")
 }
 
 export async function fetchAllProducts(): Promise<Product[]> {
@@ -260,18 +265,13 @@ export async function fetchCategory(slug: string): Promise<Product[]> {
     // Backend returned empty — fall through to client-side filter
   } catch { /* fall through */ }
 
-  // Fallback: fetch all products and filter by category slug / name
-  try {
-    const all = await fetchProducts({ limit: 200 })
-    const norm = slug.toLowerCase().replace(/[-_\s]+/g, "")
-    return all.filter((p) => {
-      const cs = (p.categorySlug ?? "").toLowerCase().replace(/[-_\s]+/g, "")
-      const cn = (p.category ?? "").toLowerCase().replace(/[-_\s]+/g, "")
-      return cs === norm || cn === norm || cs.includes(norm) || norm.includes(cs)
-    })
-  } catch {
-    return []
-  }
+  // Fallback: filter static products by category slug / name
+  const norm = slug.toLowerCase().replace(/[-_\s]+/g, "")
+  return STATIC_PRODUCTS.filter((p) => {
+    const cs = (p.categorySlug ?? "").toLowerCase().replace(/[-_\s]+/g, "")
+    const cn = (p.category ?? "").toLowerCase().replace(/[-_\s]+/g, "")
+    return cs === norm || cn === norm || cs.includes(norm) || norm.includes(cs)
+  })
 }
 
 export async function fetchCollections(params: { limit?: number } = {}): Promise<Collection[]> {
