@@ -213,9 +213,10 @@ function normalizeCollection(raw: ApiRaw): Collection {
 
 // ─── Public fetch helpers ─────────────────────────────────────────────────────
 
-export async function fetchProducts(params: { limit?: number; sort?: string } = {}): Promise<Product[]> {
+export async function fetchProducts(params: { limit?: number; sort?: string; categories?: string[] } = {}): Promise<Product[]> {
   const qs = new URLSearchParams()
   if (params.limit) qs.set("page_size", String(params.limit))
+  if (params.categories?.length) qs.set("categories", params.categories.join(","))
   try {
     const data = await apiFetch(`/store/products?${qs.toString()}`)
     const products = unwrap(data).map(normalizeProduct)
@@ -295,20 +296,17 @@ const SLUG_TO_CJ_CATEGORIES: Record<string, string[]> = {
 }
 
 export async function fetchCategory(slug: string): Promise<Product[]> {
+  const cjCats = SLUG_TO_CJ_CATEGORIES[slug]
+  if (!cjCats?.length) return []
+
   try {
-    const data = await apiFetch("/store/products?page_size=100")
-    const all = unwrap(data).map(normalizeProduct)
-
-    // Try exact categorySlug match first
-    const exactMatch = all.filter((p) => p.categorySlug === slug)
-    if (exactMatch.length > 0) return exactMatch
-
-    // Try CJ category mapping
-    const cjCats = SLUG_TO_CJ_CATEGORIES[slug]
-    if (cjCats) {
-      const mapped = all.filter((p) => cjCats.includes(p.category))
-      if (mapped.length > 0) return mapped
-    }
+    const qs = new URLSearchParams({
+      page_size: "100",
+      categories: cjCats.join(","),
+    })
+    const data = await apiFetch(`/store/products?${qs.toString()}`)
+    const products = unwrap(data).map(normalizeProduct)
+    if (products.length > 0) return products
   } catch { /* fall through */ }
 
   return []
