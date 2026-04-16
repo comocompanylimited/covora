@@ -288,6 +288,8 @@ export default function Header() {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         onOpenSearch={() => { setDrawerOpen(false); setSearchOpen(true); }}
+        onOpenCart={() => { setDrawerOpen(false); openCart(); }}
+        cartCount={itemCount}
       />
 
       {/* ── Cart drawer ────────────────────────────────────────── */}
