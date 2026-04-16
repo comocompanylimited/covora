@@ -81,6 +81,24 @@
   /* ── Header ─────────────────────────────────── */
   --header-height:     72px;
   --header-height-lg:  80px;
+
+  /* ── Border radius ───────────────────────────── */
+  --radius-xs:   4px;
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-2xl:  40px;
+  --radius-pill: 9999px;
+
+  /* ── Shadows ─────────────────────────────────── */
+  --shadow-xs:    0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm:    0 2px 10px rgba(0,0,0,0.08), 0 1px 4px rgba(0,0,0,0.04);
+  --shadow-md:    0 4px 24px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.06);
+  --shadow-lg:    0 8px 40px rgba(0,0,0,0.14), 0 3px 12px rgba(0,0,0,0.07);
+  --shadow-xl:    0 20px 60px rgba(0,0,0,0.18), 0 8px 24px rgba(0,0,0,0.09);
+  --shadow-gold:  0 4px 24px rgba(201,169,110,0.22), 0 1px 4px rgba(201,169,110,0.10);
+  --shadow-float: 0 8px 32px rgba(0,0,0,0.18), 0 2px 10px rgba(0,0,0,0.10);
 }
 
 /* ─── Base Reset ─────────────────────────────────────────────────────────── */
@@ -1835,4 +1853,306 @@ button {
 
 @media (min-width: 769px) {
   .show-mobile { display: none !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   GLASSMORPHISM SYSTEM
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Dark glass — for overlays on dark/video backgrounds */
+.glass {
+  background: rgba(12,10,14,0.52);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255,255,255,0.09);
+}
+
+/* Gold-tinted glass — for premium accents */
+.glass-warm {
+  background: rgba(201,169,110,0.07);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(201,169,110,0.16);
+}
+
+/* Light glass — for elements on light backgrounds */
+.glass-light {
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255,255,255,0.65);
+  box-shadow: var(--shadow-md);
+}
+
+/* Ultra-light — card overlays */
+.glass-ultra {
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   RADIUS OVERRIDES — applied to all key components
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Product cards */
+.pcard-img {
+  border-radius: var(--radius-md) !important;
+}
+.pcard-quick-add {
+  border-radius: 0 0 var(--radius-md) var(--radius-md) !important;
+}
+
+/* Buttons — pill by default, inherit radius for edge cases */
+.btn {
+  border-radius: var(--radius-pill);
+}
+.btn-icon {
+  border-radius: var(--radius-md);
+}
+
+/* Inputs */
+.input-box,
+.select-luxury,
+.textarea-luxury {
+  border-radius: var(--radius-sm) !important;
+}
+
+/* Checkboxes */
+.checkbox-luxury {
+  border-radius: var(--radius-xs) !important;
+}
+
+/* Modal */
+.modal-panel {
+  border-radius: var(--radius-xl) !important;
+  overflow: hidden;
+}
+
+/* Drawer — rounded left edge when sliding from right */
+.drawer-right {
+  border-radius: var(--radius-xl) var(--radius-xl) var(--radius-xl) var(--radius-xl) !important;
+  top: 0.75rem !important;
+  bottom: 0.75rem !important;
+  height: auto !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+
+/* Toast */
+.toast {
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Badge */
+.badge {
+  border-radius: var(--radius-pill);
+}
+
+/* Size buttons */
+.size-btn {
+  border-radius: var(--radius-xs);
+}
+
+/* Pagination */
+.page-btn {
+  border-radius: var(--radius-xs);
+}
+
+/* Editorial tile */
+.editorial-tile {
+  border-radius: var(--radius-lg) !important;
+}
+
+/* Mega menu */
+.mega-menu {
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  border-top: none !important;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   FLOATING ACTION BUTTONS (right-side panel)
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.covora-fab {
+  position: fixed;
+  right: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: var(--z-sticky);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+
+@media (max-width: 1024px) {
+  .covora-fab { display: none; }
+}
+
+.covora-fab-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: all;
+  transition:
+    transform 0.3s var(--ease-spring),
+    box-shadow 0.3s var(--ease-luxury),
+    background 0.3s ease;
+  /* Glass */
+  background: rgba(255,255,255,0.86);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(0,0,0,0.07);
+  box-shadow: var(--shadow-float);
+  color: #666666;
+  outline: none;
+}
+
+.covora-fab-btn:hover {
+  transform: scale(1.10);
+  box-shadow: var(--shadow-gold), var(--shadow-md);
+  background: rgba(255,255,255,0.98);
+  color: var(--gold-dark);
+  border-color: rgba(201,169,110,0.22);
+}
+
+.covora-fab-btn:active {
+  transform: scale(0.96);
+}
+
+/* Gold ring badge on cart */
+.covora-fab-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--gold);
+  color: var(--black);
+  font-family: var(--font-inter);
+  font-size: 0.42rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(201,169,110,0.35);
+  pointer-events: none;
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   HERO ENHANCEMENTS
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Glass pill label on dark backgrounds (e.g. video hero) */
+.hero-label-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
+  background: rgba(201,169,110,0.10);
+  border: 1px solid rgba(201,169,110,0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-family: var(--font-inter);
+  font-size: 0.5rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+}
+
+/* Hero CTA glass button */
+.btn-glass {
+  background: rgba(255,255,255,0.10);
+  color: var(--ivory);
+  border: 1px solid rgba(255,255,255,0.22);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: var(--radius-pill);
+  transition: all 0.35s var(--ease-luxury);
+}
+.btn-glass:hover {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(201,169,110,0.45);
+  color: var(--gold-bright);
+  transform: translateY(-1px);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   SECTION & CARD POLISH
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Rounded category tiles */
+.hp-cat-tile {
+  border-radius: var(--radius-lg) !important;
+}
+.hp-cat-bg {
+  border-radius: inherit;
+}
+.hp-cat-overlay {
+  border-radius: inherit;
+}
+
+/* Service card glass */
+.hp-service-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.6);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s var(--ease-luxury), box-shadow 0.3s ease;
+}
+.hp-service-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Smooth scrim for collection/category cards */
+.scrim-luxury {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(6,5,8,0.92) 0%,
+    rgba(6,5,8,0.48) 35%,
+    rgba(6,5,8,0.10) 65%,
+    transparent 100%
+  );
+  border-radius: inherit;
+}
+
+/* Image hover zoom wrapper — rounded */
+.img-zoom-wrap {
+  border-radius: var(--radius-md);
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ENTRY PAGE ENHANCEMENTS
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.entry-glass-card {
+  padding: clamp(2.5rem, 4vw, 4rem) clamp(2rem, 4vw, 4rem);
+  border-radius: var(--radius-2xl);
+  background: rgba(255,255,255,0.04);
+  backdrop-filter: blur(32px) saturate(150%);
+  -webkit-backdrop-filter: blur(32px) saturate(150%);
+  border: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
 }

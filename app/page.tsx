@@ -37,6 +37,7 @@ export default function EntryPage() {
 
       {/* ── Centre content ─────────────────────────────── */}
       <div
+        className="entry-glass-card"
         style={{
           display:       "flex",
           flexDirection: "column",
@@ -45,7 +46,6 @@ export default function EntryPage() {
           position:      "relative",
           zIndex:        1,
           textAlign:     "center",
-          padding:       "0 2rem",
         }}
       >
         {/* Wordmark */}
@@ -91,7 +91,7 @@ export default function EntryPage() {
         />
 
         {/* CTA */}
-        <Link href="/home" className="btn btn-outline btn-md">
+        <Link href="/home" className="btn btn-glass btn-md">
           Enter Store
         </Link>
       </div>

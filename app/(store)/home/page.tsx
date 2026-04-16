@@ -75,16 +75,13 @@ export default async function HomePage() {
           <source src="/videos/women.mp4" type="video/mp4" />
         </video>
 
-        {/* Dark overlay for text readability */}
-        <div
-          aria-hidden="true"
-          style={{
-            position:   "absolute",
-            inset:      0,
-            background: "linear-gradient(to top, rgba(6,5,8,0.78) 0%, rgba(6,5,8,0.38) 50%, rgba(6,5,8,0.18) 100%)",
-            pointerEvents: "none",
-          }}
-        />
+        {/* Multi-layer cinematic overlay */}
+        <div aria-hidden="true" style={{ position: "absolute", inset: 0, pointerEvents: "none" }}>
+          {/* Deep bottom scrim */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(4,3,6,0.92) 0%, rgba(4,3,6,0.55) 40%, rgba(4,3,6,0.18) 70%, rgba(4,3,6,0.04) 100%)" }} />
+          {/* Subtle left vignette for text zone */}
+          <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(4,3,6,0.38) 0%, transparent 60%)" }} />
+        </div>
 
         {/* Content */}
         <div
@@ -95,20 +92,11 @@ export default async function HomePage() {
             position: "relative",
           }}
         >
-          {/* Season label */}
-          <p
-            style={{
-              fontFamily:    "var(--font-inter)",
-              fontSize:      "0.52rem",
-              fontWeight:    500,
-              letterSpacing: "0.28em",
-              textTransform: "uppercase",
-              color:         "var(--gold)",
-              marginBottom:  "1.75rem",
-            }}
-          >
+          {/* Season label — glass pill */}
+          <div className="hero-label-pill" style={{ marginBottom: "1.75rem" }}>
+            <span style={{ width: "4px", height: "4px", borderRadius: "50%", background: "var(--gold)", opacity: 0.7, flexShrink: 0 }} />
             Spring / Summer 2026
-          </p>
+          </div>
 
           {/* Headline */}
           <h1
@@ -153,20 +141,11 @@ export default async function HomePage() {
           </p>
 
           {/* CTAs */}
-          <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap" }}>
-            <Link href="/new-in" className="btn btn-white btn-md">Shop New In</Link>
-            <Link
-              href="/collections"
-              style={{
-                display: "inline-flex", alignItems: "center", justifyContent: "center",
-                fontFamily: "var(--font-inter)", fontSize: "0.62rem", fontWeight: 500,
-                letterSpacing: "0.20em", textTransform: "uppercase",
-                color: "var(--off-white)", background: "transparent",
-                border: "1px solid rgba(201,169,110,0.42)", padding: "1rem 2.5rem",
-                textDecoration: "none", transition: "all 0.3s ease",
-              }}
-              className="hero-outline-btn"
-            >
+          <div style={{ display: "flex", gap: "0.85rem", flexWrap: "wrap", alignItems: "center" }}>
+            <Link href="/new-in" className="btn btn-white btn-md" style={{ borderRadius: "var(--radius-pill)", boxShadow: "var(--shadow-gold)" }}>
+              Shop New In
+            </Link>
+            <Link href="/collections" className="btn btn-glass btn-md">
               View Collection
             </Link>
           </div>
@@ -411,43 +390,47 @@ export default async function HomePage() {
       {/* ── 5. SERVICE STRIP ───────────────────────────────────────── */}
       <section
         style={{
-          background:    "#F2EFE9",
+          background:    "#EEEAE3",
           borderTop:     "1px solid rgba(0,0,0,0.05)",
-          paddingTop:    "clamp(3rem, 4vw, 4rem)",
-          paddingBottom: "clamp(3rem, 4vw, 4rem)",
+          paddingTop:    "clamp(3.5rem, 5vw, 5rem)",
+          paddingBottom: "clamp(3.5rem, 5vw, 5rem)",
           paddingLeft:   "var(--container-padding)",
           paddingRight:  "var(--container-padding)",
         }}
       >
-        <div className="hp-services" style={{ maxWidth: "var(--container-wide)", margin: "0 auto" }}>
+        <div className="hp-services-grid" style={{ maxWidth: "var(--container-wide)", margin: "0 auto" }}>
           {[
-            { label: "Free Returns",      sub: "On all UK orders" },
-            { label: "Next-Day Delivery", sub: "Order before 2 pm" },
-            { label: "Expert Styling",    sub: "Personal shopping available" },
-            { label: "Gift Wrapping",     sub: "Complimentary on request" },
-          ].map((s, i) => (
-            <div key={s.label} className="hp-service-item">
-              {i > 0 && <div className="hp-service-rule" aria-hidden="true" />}
+            { icon: "↩", label: "Free Returns",      sub: "On all UK orders" },
+            { icon: "⚡", label: "Next-Day Delivery", sub: "Order before 2 pm" },
+            { icon: "✦",  label: "Expert Styling",    sub: "Personal shopping available" },
+            { icon: "◇",  label: "Gift Wrapping",     sub: "Complimentary on request" },
+          ].map((s) => (
+            <div key={s.label} className="hp-service-card">
+              <p
+                style={{
+                  fontFamily:    "var(--font-cormorant)",
+                  fontSize:      "1.6rem",
+                  color:         "var(--gold)",
+                  lineHeight:    1,
+                  marginBottom:  "1rem",
+                }}
+              >
+                {s.icon}
+              </p>
               <p
                 style={{
                   fontFamily:    "var(--font-inter)",
-                  fontSize:      "0.58rem",
+                  fontSize:      "0.56rem",
                   fontWeight:    500,
-                  letterSpacing: "0.12em",
+                  letterSpacing: "0.14em",
                   textTransform: "uppercase",
-                  color:         "#222222",
+                  color:         "#1A1A1A",
                   marginBottom:  "0.4rem",
                 }}
               >
                 {s.label}
               </p>
-              <p
-                style={{
-                  fontFamily: "var(--font-inter)",
-                  fontSize:   "0.72rem",
-                  color:      "#888888",
-                }}
-              >
+              <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#888888" }}>
                 {s.sub}
               </p>
             </div>
@@ -457,13 +440,6 @@ export default async function HomePage() {
 
       {/* ── Page-scoped styles ─────────────────────────────────────── */}
       <style>{`
-
-        /* ─ Hero outline button ─────────────────────── */
-        .hero-outline-btn:hover {
-          border-color: var(--gold);
-          color: var(--gold);
-          background: rgba(201,169,110,0.06);
-        }
 
         /* ─ Product grid ────────────────────────────── */
         .hp-product-grid {
@@ -564,33 +540,15 @@ export default async function HomePage() {
         @media (max-width: 480px) { .hp-collection-grid { grid-template-columns: 1fr; } }
 
         /* ─ Service strip ────────────────────────────── */
-        .hp-services {
+        .hp-services-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 0;
+          gap: clamp(1rem, 2vw, 1.5rem);
         }
         @media (max-width: 768px) {
-          .hp-services { grid-template-columns: repeat(2, 1fr); gap: 0; }
-          .hp-service-rule { display: none; }
+          .hp-services-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (max-width: 480px) { .hp-services { grid-template-columns: 1fr; } }
-
-        .hp-service-item {
-          display:        flex;
-          flex-direction: column;
-          align-items:    center;
-          text-align:     center;
-          padding:        0 2rem;
-          position:       relative;
-        }
-        .hp-service-rule {
-          position:   absolute;
-          left:       0;
-          top:        10%;
-          bottom:     10%;
-          width:      1px;
-          background: rgba(0,0,0,0.09);
-        }
+        @media (max-width: 480px) { .hp-services-grid { grid-template-columns: 1fr; } }
 
       `}</style>
     </>
