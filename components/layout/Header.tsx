@@ -25,7 +25,8 @@ interface NavItem {
 }
 
 const NAV_LEFT: NavItem[] = [
-  { label: "New In", href: "/new-in" },
+  { label: "New In",   href: "/new-in" },
+  { label: "Shop All", href: "/shop" },
   {
     label: "Clothing",
     href:  "/category/clothing",

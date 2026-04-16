@@ -1352,14 +1352,18 @@ button {
 .pcard-img {
   position: relative;
   overflow: hidden;
-  background: #F0EDE8;
+  background: linear-gradient(145deg, #f5f2ee 0%, #ede9e3 100%);
   aspect-ratio: 4 / 5;
-  border: 1px solid rgba(0,0,0,0.08);
-  transition: border-color 0.4s var(--ease-luxury);
+  border: 1px solid rgba(0,0,0,0.07);
+  transition: border-color 0.4s var(--ease-luxury), box-shadow 0.4s var(--ease-luxury);
 }
 
 .pcard:hover .pcard-img {
-  border-color: rgba(0,0,0,0.16);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+}
+
+.pcard:hover .pcard-img {
+  border-color: rgba(0,0,0,0.14);
 }
 
 .pcard-img img {

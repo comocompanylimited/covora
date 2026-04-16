@@ -49,6 +49,18 @@ export function ProductCard({
         className="pcard-img"
         style={!hasImage && bg ? { background: bg } : undefined}
       >
+        {/* Placeholder icon when no image */}
+        {!hasImage && (
+          <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: "0.75rem" }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.35)" strokeWidth="0.8">
+              <rect x="3" y="3" width="18" height="18" rx="1" />
+              <circle cx="8.5" cy="8.5" r="1.5" />
+              <path d="m21 15-5-5L5 21" />
+            </svg>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.45rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(201,169,110,0.4)" }}>Covora</span>
+          </div>
+        )}
+
         {hasImage && (
           <Image
             src={src!}
