@@ -91,7 +91,7 @@ export default function CheckoutPage() {
                       ? <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="#111111" strokeWidth="1.5"><path d="M1.5 5L4 7.5L8.5 2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
                       : <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.48rem", fontWeight: 600, color: i === currentIndex ? "var(--gold)" : "#BBBBBB" }}>{i + 1}</span>}
                   </div>
-                  <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.52rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: i === currentIndex ? "var(--gold-dark)" : i < currentIndex ? "#555555" : "#AAAAAA" }}>{s.label}</span>
+                  <span className="checkout-stepper-label" style={{ fontFamily: "var(--font-inter)", fontSize: "0.52rem", fontWeight: 600, letterSpacing: "0.14em", textTransform: "uppercase", color: i === currentIndex ? "var(--gold-dark)" : i < currentIndex ? "#555555" : "#AAAAAA" }}>{s.label}</span>
                 </div>
                 {i < STEPS.length - 1 && <div style={{ flex: 1, height: "1px", background: i < currentIndex ? "var(--gold)" : "rgba(0,0,0,0.1)", margin: "0 0.75rem" }} />}
               </div>
@@ -124,7 +124,7 @@ export default function CheckoutPage() {
         </div>
 
         {/* Right: order summary */}
-        <div style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)", padding: "2rem", position: "sticky", top: "calc(var(--header-height) + 2rem)" }}>
+        <div className="checkout-summary" style={{ background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)", padding: "2rem", position: "sticky", top: "calc(var(--header-height) + 2rem)" }}>
           <div style={{ height: "2px", background: "var(--gold)", marginBottom: "1.5rem" }} />
           <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.52rem", fontWeight: 600, letterSpacing: "0.2em", textTransform: "uppercase", color: "#888888", marginBottom: "1.5rem" }}>Order Summary</p>
           <div style={{ display: "flex", flexDirection: "column", gap: "1rem", marginBottom: "1.5rem" }}>
@@ -165,8 +165,14 @@ export default function CheckoutPage() {
       </div>
 
       <style>{`
-        @media (max-width: 900px) { .checkout-layout { grid-template-columns: 1fr !important; } }
+        @media (max-width: 900px) {
+          .checkout-layout { grid-template-columns: 1fr !important; }
+          .checkout-summary { position: static !important; order: -1; }
+        }
         .checkout-input:focus { border-color: var(--gold) !important; }
+        @media (max-width: 480px) {
+          .checkout-stepper-label { display: none; }
+        }
       `}</style>
     </div>
   );
@@ -307,61 +313,57 @@ function ShippingStep({ initial, onNext }: { initial: ShippingData; onNext: (d: 
 // ─── Payment step ─────────────────────────────────────────────────────────────
 
 function PaymentStep({ onNext }: { onNext: () => void }) {
-  const [f, setF] = useState({ card: "", expiry: "", cvv: "", name: "" });
-  const [e, setE] = useState<Record<string, string>>({});
-
-  function set(k: keyof typeof f, v: string) {
-    setF((p) => ({ ...p, [k]: v }));
-    if (e[k]) setE((p) => ({ ...p, [k]: "" }));
-  }
-
-  function handleNext() {
-    const errs: Record<string, string> = {};
-    if (!f.name.trim())   errs.name   = "Name on card is required";
-    if (!f.card.trim())   errs.card   = "Card number is required";
-    if (!f.expiry.trim()) errs.expiry = "Expiry date is required";
-    if (!f.cvv.trim())    errs.cvv    = "CVV is required";
-    if (Object.keys(errs).length) { setE(errs); return; }
-    onNext();
-  }
-
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
       <h2 style={{ fontFamily: "var(--font-cormorant)", fontSize: "1.6rem", fontWeight: 300, color: "#111111" }}>Payment</h2>
-      <div style={{ padding: "1.25rem", border: "1px solid rgba(0,0,0,0.07)", background: "#FAF9F7" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "1.25rem" }}>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" strokeWidth="1.5">
-            <rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" />
-          </svg>
-          <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.68rem", color: "#888888" }}>Secure 256-bit SSL encryption</span>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-          <FG>
-            <label style={LABEL}>Card Number <span style={{ color: "#C0392B" }}>*</span></label>
-            <input className="checkout-input" style={inputStyle(!!e.card)} placeholder="0000 0000 0000 0000" maxLength={19} value={f.card} onChange={(ev) => set("card", ev.target.value)} />
-            <FieldError msg={e.card} />
-          </FG>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-            <FG>
-              <label style={LABEL}>Expiry <span style={{ color: "#C0392B" }}>*</span></label>
-              <input className="checkout-input" style={inputStyle(!!e.expiry)} placeholder="MM / YY" maxLength={7} value={f.expiry} onChange={(ev) => set("expiry", ev.target.value)} />
-              <FieldError msg={e.expiry} />
-            </FG>
-            <FG>
-              <label style={LABEL}>CVV <span style={{ color: "#C0392B" }}>*</span></label>
-              <input className="checkout-input" style={inputStyle(!!e.cvv)} placeholder="000" maxLength={4} value={f.cvv} onChange={(ev) => set("cvv", ev.target.value)} />
-              <FieldError msg={e.cvv} />
-            </FG>
+
+      {/* Stripe notice */}
+      <div style={{ padding: "1.75rem", border: "1px solid rgba(201,169,110,0.22)", background: "rgba(201,169,110,0.03)" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", gap: "1rem" }}>
+          <div style={{ flexShrink: 0, width: "40px", height: "40px", border: "1px solid rgba(201,169,110,0.3)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--gold-dark)" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.4">
+              <rect x="3" y="11" width="18" height="11" rx="2" />
+              <path d="M7 11V7a5 5 0 0 1 10 0v4" strokeLinecap="round" />
+            </svg>
           </div>
-          <FG>
-            <label style={LABEL}>Name on Card <span style={{ color: "#C0392B" }}>*</span></label>
-            <input className="checkout-input" style={inputStyle(!!e.name)} placeholder="Jane Smith" value={f.name} onChange={(ev) => set("name", ev.target.value)} />
-            <FieldError msg={e.name} />
-          </FG>
+          <div>
+            <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.65rem", fontWeight: 600, letterSpacing: "0.08em", color: "#111111", marginBottom: "0.4rem" }}>
+              Secure Payment via Stripe
+            </p>
+            <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#777777", lineHeight: 1.75 }}>
+              Your payment details are handled securely by Stripe. After reviewing your order, you&rsquo;ll be redirected to Stripe&rsquo;s encrypted checkout to complete your purchase.
+            </p>
+          </div>
         </div>
       </div>
-      <div style={{ paddingTop: "0.5rem" }}>
-        <ProceedButton onClick={handleNext} label="Review Order" />
+
+      {/* Accepted methods */}
+      <div>
+        <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.52rem", fontWeight: 600, letterSpacing: "0.16em", textTransform: "uppercase", color: "#BBBBBB", marginBottom: "0.85rem" }}>
+          Accepted Methods
+        </p>
+        <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+          {["Visa", "Mastercard", "Amex", "Apple Pay", "Google Pay"].map((m) => (
+            <span key={m} style={{
+              fontFamily: "var(--font-inter)", fontSize: "0.56rem", letterSpacing: "0.06em",
+              color: "#777777", border: "1px solid rgba(0,0,0,0.1)",
+              padding: "0.28rem 0.65rem", background: "#FFFFFF",
+            }}>{m}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", paddingTop: "0.25rem" }}>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.3)" strokeWidth="1.4">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+        <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.58rem", color: "#BBBBBB", letterSpacing: "0.04em" }}>
+          256-bit SSL · PCI DSS compliant · No card data stored
+        </span>
+      </div>
+
+      <div style={{ paddingTop: "0.25rem" }}>
+        <ProceedButton onClick={onNext} label="Review Order" />
       </div>
     </div>
   );

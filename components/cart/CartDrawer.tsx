@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
@@ -138,20 +139,25 @@ export default function CartDrawer() {
                     borderBottom: idx < items.length - 1 ? "1px solid rgba(0,0,0,0.07)" : "none",
                   }}
                 >
-                  {/* Image placeholder */}
+                  {/* Product image */}
                   <Link href={`/product/${item.slug}`} onClick={closeCart} style={{ flexShrink: 0 }}>
                     <div style={{
                       width: "80px", aspectRatio: "3/4",
                       background: "#F0EDE8",
                       border: "1px solid rgba(0,0,0,0.07)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      overflow: "hidden",
+                      position: "relative", overflow: "hidden",
                     }}>
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.2)" strokeWidth="1">
-                        <rect x="3" y="3" width="18" height="18" rx="1" />
-                        <circle cx="8.5" cy="8.5" r="1.5" />
-                        <path d="m21 15-5-5L5 21" />
-                      </svg>
+                      {item.image ? (
+                        <Image src={item.image} alt={item.imageAlt ?? item.name} fill sizes="80px" style={{ objectFit: "cover" }} />
+                      ) : (
+                        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.35)" strokeWidth="0.9">
+                            <rect x="3" y="3" width="18" height="18" rx="1" />
+                            <circle cx="8.5" cy="8.5" r="1.5" />
+                            <path d="m21 15-5-5L5 21" />
+                          </svg>
+                        </div>
+                      )}
                     </div>
                   </Link>
 

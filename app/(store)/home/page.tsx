@@ -232,21 +232,34 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Grid — wrapped so CSS overrides can scope to light bg */}
-          <div className="hp-light-grid hp-product-grid">
-            {newIn.map((p) => (
-              <ProductCard
-                key={p.id}
-                href={`/product/${p.slug}`}
-                name={p.name}
-                price={p.price}
-                originalPrice={p.originalPrice}
-                src={p.src}
-                bg={p.bg}
-                badge={p.badge}
-              />
-            ))}
-          </div>
+          {/* Grid */}
+          {newIn.length > 0 ? (
+            <div className="hp-light-grid hp-product-grid">
+              {newIn.map((p) => (
+                <ProductCard
+                  key={p.id}
+                  href={`/product/${p.slug}`}
+                  name={p.name}
+                  price={p.price}
+                  originalPrice={p.originalPrice}
+                  src={p.src}
+                  bg={p.bg}
+                  badge={p.badge}
+                />
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "4rem 2rem", border: "1px solid rgba(0,0,0,0.07)" }}>
+              <div style={{ width: "28px", height: "1px", background: "var(--gold)", opacity: 0.4, margin: "0 auto 1.75rem" }} />
+              <p style={{ fontFamily: "var(--font-cormorant)", fontSize: "clamp(1.4rem,2.5vw,2rem)", fontWeight: 300, color: "#111111", marginBottom: "0.75rem" }}>
+                New arrivals coming soon
+              </p>
+              <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.75rem", color: "#AAAAAA", marginBottom: "2rem" }}>
+                Explore our full collection in the meantime.
+              </p>
+              <Link href="/shop" className="btn btn-inverse btn-sm">Shop All</Link>
+            </div>
+          )}
         </div>
       </section>
 
@@ -371,18 +384,27 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="hp-collection-grid">
-            {featured.map((col) => (
-              <CollectionCard
-                key={col.id}
-                href={`/collection/${col.slug}`}
-                title={col.name}
-                label={col.season}
-                src={col.src}
-                bg={col.bg}
-              />
-            ))}
-          </div>
+          {featured.length > 0 ? (
+            <div className="hp-collection-grid">
+              {featured.map((col) => (
+                <CollectionCard
+                  key={col.id}
+                  href={`/collection/${col.slug}`}
+                  title={col.name}
+                  label={col.season}
+                  src={col.src}
+                  bg={col.bg}
+                />
+              ))}
+            </div>
+          ) : (
+            <div style={{ textAlign: "center", padding: "3rem 2rem", border: "1px solid rgba(0,0,0,0.07)" }}>
+              <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.72rem", color: "#AAAAAA", marginBottom: "1.5rem" }}>
+                Collections are being curated. Check back soon.
+              </p>
+              <Link href="/shop" className="btn btn-inverse btn-sm">Shop All Pieces</Link>
+            </div>
+          )}
         </div>
       </section>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/store/cart";
 import { formatPrice } from "@/lib/utils";
@@ -126,19 +127,24 @@ export default function CartPage() {
                 marginLeft: "-1.25rem", marginRight: "-1.25rem",
               }}
             >
-              {/* Image placeholder */}
+              {/* Product image */}
               <Link href={`/product/${item.slug}`} style={{ flexShrink: 0, textDecoration: "none" }}>
                 <div style={{
                   width: "clamp(90px, 12vw, 130px)", aspectRatio: "3/4",
                   background: "#F0EDE8", border: "1px solid rgba(0,0,0,0.07)",
-                  display: "flex", alignItems: "center", justifyContent: "center",
-                  overflow: "hidden", transition: "opacity 0.2s ease",
+                  position: "relative", overflow: "hidden", transition: "opacity 0.2s ease",
                 }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1">
-                    <rect x="3" y="3" width="18" height="18" rx="1" />
-                    <circle cx="8.5" cy="8.5" r="1.5" />
-                    <path d="m21 15-5-5L5 21" />
-                  </svg>
+                  {item.image ? (
+                    <Image src={item.image} alt={item.imageAlt ?? item.name} fill sizes="130px" style={{ objectFit: "cover" }} />
+                  ) : (
+                    <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.35)" strokeWidth="0.9">
+                        <rect x="3" y="3" width="18" height="18" rx="1" />
+                        <circle cx="8.5" cy="8.5" r="1.5" />
+                        <path d="m21 15-5-5L5 21" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
               </Link>
 
@@ -229,7 +235,7 @@ export default function CartPage() {
         </div>
 
         {/* ── Right: Summary ───────────────────────────────────────── */}
-        <div style={{ position: "sticky", top: "calc(var(--header-height) + 1.5rem)", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)" }}>
+        <div className="cart-summary" style={{ position: "sticky", top: "calc(var(--header-height) + 1.5rem)", background: "#FFFFFF", border: "1px solid rgba(0,0,0,0.07)" }}>
           {/* Gold top accent */}
           <div style={{ height: "2px", background: "linear-gradient(to right, var(--gold-dark), rgba(201,169,110,0.15))" }} />
 
@@ -362,6 +368,7 @@ export default function CartPage() {
       <style>{`
         @media (max-width: 860px) {
           .cart-layout { grid-template-columns: 1fr !important; }
+          .cart-summary { position: static !important; }
         }
       `}</style>
     </div>

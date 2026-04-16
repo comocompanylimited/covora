@@ -110,7 +110,7 @@ export function ProductDetailClient({ product, related }: Props) {
       slug:               product.slug,
       price:              priceNum,
       quantity:           qty,
-      image:              "",
+      image:              product.images[0]?.src ?? "",
       imageAlt:           product.name,
       selectedAttributes: {
         ...(activeSize  ? { Size:   activeSize  } : {}),
