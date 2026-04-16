@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { fetchNewIn } from "@/lib/api";
+import { STATIC_PRODUCTS } from "@/lib/static-products";
 import { ShopClient } from "@/components/shop/ShopClient";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title:       "New In — Covora",
@@ -8,7 +11,10 @@ export const metadata: Metadata = {
 };
 
 export default async function NewInPage() {
-  const products = await fetchNewIn();
+  let products = await fetchNewIn();
+  if (products.length === 0) {
+    products = STATIC_PRODUCTS.filter((p) => "badge" in p && p.badge === "New");
+  }
   return (
     <ShopClient
       products={products}
