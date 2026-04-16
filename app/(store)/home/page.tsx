@@ -13,19 +13,20 @@ export const metadata: Metadata = {
 
 // ─── Static data ───────────────────────────────────────────────────────────────
 
-// Category editorial panels — swap bg for real image src when available
+const R2 = "https://pub-1d6c9d49352543bd9274a49abd4df1f95.r2.dev";
+
 const EDIT_CATS = [
-  { n: "01", label: "Dresses",   sub: "Day to Evening",    href: "/category/dresses",   bg: "linear-gradient(158deg, #0d0b15 0%, #1c1428 55%, #100c1c 100%)" },
-  { n: "02", label: "Outerwear", sub: "The Outer Edit",    href: "/category/outerwear", bg: "linear-gradient(158deg, #090c11 0%, #111b24 55%, #0b1218 100%)" },
-  { n: "03", label: "Tops",      sub: "Effortless Ease",   href: "/category/tops",      bg: "linear-gradient(158deg, #100d09 0%, #1e1610 55%, #140e08 100%)" },
-  { n: "04", label: "Shoes",     sub: "Finish the Look",   href: "/category/shoes",     bg: "linear-gradient(158deg, #0f0b08 0%, #1e1208 55%, #160e06 100%)" },
+  { n: "01", label: "Dresses",   sub: "Day to Evening",  href: "/category/dresses",   img: `${R2}/womenindress.png` },
+  { n: "02", label: "Outerwear", sub: "The Outer Edit",  href: "/category/outerwear", img: `${R2}/outer%20wear.png` },
+  { n: "03", label: "Knitwear",  sub: "Effortless Ease", href: "/category/knitwear",  img: `${R2}/womensknitwear.png` },
+  { n: "04", label: "Shoes",     sub: "Finish the Look", href: "/category/shoes",     img: `${R2}/shoesandbags.png` },
 ] as const;
 
 const MOOD_PANELS = [
-  { label: "Evening Edit",        sub: "Dressed for the occasion", href: "/category/dresses",   bg: "linear-gradient(148deg, #0b0812 0%, #160e24 60%, #0d0918 100%)" },
-  { label: "Everyday Luxury",     sub: "Elevated essentials",      href: "/shop",               bg: "linear-gradient(148deg, #0d0b08 0%, #1a1308 60%, #120d06 100%)" },
-  { label: "Tailored Minimalism", sub: "Structure, refined",       href: "/category/outerwear", bg: "linear-gradient(148deg, #090b0d 0%, #121820 60%, #0b0e14 100%)" },
-  { label: "Statement Dressing",  sub: "Bold. Intentional. Yours.", href: "/new-in",            bg: "linear-gradient(148deg, #0e0a08 0%, #1c1208 60%, #140c08 100%)" },
+  { label: "Evening Edit",        sub: "Dressed for the occasion", href: "/category/dresses",   img: `${R2}/womenindress.png` },
+  { label: "Everyday Luxury",     sub: "Elevated essentials",      href: "/shop",               img: `${R2}/womensknitwear.png` },
+  { label: "Tailored Minimalism", sub: "Structure, refined",       href: "/category/outerwear", img: `${R2}/outer%20wear.png` },
+  { label: "Statement Dressing",  sub: "Bold. Intentional. Yours.", href: "/new-in",            img: `${R2}/bags.png` },
 ] as const;
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -138,7 +139,7 @@ export default async function HomePage() {
         <div className="hp-cat-asymmetric">
           {/* Large feature card */}
           <Link href={EDIT_CATS[0].href} className="hp-cat-large">
-            <div className="hp-cat-bg" style={{ background: EDIT_CATS[0].bg }} />
+            <img src={EDIT_CATS[0].img} alt={EDIT_CATS[0].label} className="hp-cat-bg hp-cat-img" />
             <div className="hp-cat-grain-overlay" />
             <div className="hp-cat-scrim" />
             <div className="hp-cat-large-content">
@@ -156,7 +157,7 @@ export default async function HomePage() {
           <div className="hp-cat-col">
             {EDIT_CATS.slice(1).map(cat => (
               <Link key={cat.href} href={cat.href} className="hp-cat-small">
-                <div className="hp-cat-bg" style={{ background: cat.bg }} />
+                <img src={cat.img} alt={cat.label} className="hp-cat-bg hp-cat-img" />
                 <div className="hp-cat-grain-overlay" />
                 <div className="hp-cat-scrim" />
                 <div className="hp-cat-small-content">
@@ -235,11 +236,10 @@ export default async function HomePage() {
 
             {/* Visual panel */}
             <div className="hp-promo-visual" aria-hidden="true">
-              <div className="hp-promo-visual-bg" />
-              <div className="hp-promo-visual-frame" />
-              <div className="hp-promo-visual-inner">
-                <p className="hp-promo-visual-word">Covora</p>
-                <p className="hp-promo-visual-season">SS 2026</p>
+              <img src={`${R2}/womenindress.png`} alt="Covora Campaign" className="hp-cat-img" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+              <div className="hp-promo-visual-frame" style={{ position: "absolute", inset: "1.5rem", border: "1px solid rgba(201,169,110,0.18)", zIndex: 2 }} />
+              <div style={{ position: "absolute", bottom: "2rem", left: 0, right: 0, textAlign: "center", zIndex: 3 }}>
+                <p className="hp-promo-visual-season" style={{ background: "rgba(4,3,6,0.55)", display: "inline-block", padding: "0.3rem 1rem" }}>SS 2026</p>
               </div>
             </div>
           </div>
@@ -303,15 +303,9 @@ export default async function HomePage() {
       <section className="hp-brand">
         {/* Visual left */}
         <div className="hp-brand-visual" aria-hidden="true">
-          <div className="hp-brand-visual-bg" />
-          <div className="hp-brand-grain" />
+          <img src={`${R2}/womensknitwear.png`} alt="Covora" className="hp-cat-img" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center top" }} />
+          <div className="hp-brand-visual-bg" style={{ opacity: 0.45 }} />
           <div className="hp-brand-frame" />
-          <div className="hp-brand-center">
-            <div className="hp-brand-wordmark">Covora</div>
-            <div className="hp-brand-hr" />
-            <div className="hp-brand-tagline">Lumière</div>
-          </div>
-          {/* Corner markers */}
           <div className="hp-brand-corner hp-brand-corner--tl" />
           <div className="hp-brand-corner hp-brand-corner--br" />
         </div>
@@ -355,7 +349,7 @@ export default async function HomePage() {
         <div className="hp-mood-grid hp-container">
           {MOOD_PANELS.map((m, i) => (
             <Link key={m.href + m.label} href={m.href} className="hp-mood-card">
-              <div className="hp-mood-bg" style={{ background: m.bg }} />
+              <img src={m.img} alt={m.label} className="hp-mood-bg hp-cat-img" />
               <div className="hp-mood-grain" />
               <div className="hp-mood-scrim" />
               <div className="hp-mood-num">{String(i + 1).padStart(2, "0")}</div>
@@ -382,17 +376,17 @@ export default async function HomePage() {
         </div>
 
         <div className="hp-gallery hp-container">
-          {/* Row 1: 1 wide + 2 normal */}
+          {/* Row 1 */}
           <div className="hp-gallery-row hp-gallery-row--1">
-            <GalleryCell bg="linear-gradient(158deg,#10091a,#1c1230)" wide />
-            <GalleryCell bg="linear-gradient(158deg,#0d0c08,#1e1408)" />
-            <GalleryCell bg="linear-gradient(158deg,#070c10,#12202e)" />
+            <GalleryCell img={`${R2}/womenindress.png`}     alt="Women in Dress"  wide />
+            <GalleryCell img={`${R2}/womensknitwear.png`}   alt="Knitwear" />
+            <GalleryCell img={`${R2}/shoesandbags.png`}     alt="Shoes & Bags" />
           </div>
-          {/* Row 2: 2 normal + 1 wide */}
+          {/* Row 2 */}
           <div className="hp-gallery-row hp-gallery-row--2">
-            <GalleryCell bg="linear-gradient(158deg,#100908,#201208)" />
-            <GalleryCell bg="linear-gradient(158deg,#0a0910,#16122a)" />
-            <GalleryCell bg="linear-gradient(158deg,#090c0a,#121e12)" wide />
+            <GalleryCell img={`${R2}/bags.png`}             alt="Bags" />
+            <GalleryCell img={`${R2}/outer%20wear.png`}     alt="Outerwear" />
+            <GalleryCell img={`${R2}/Sets.png`}             alt="Sets"            wide />
           </div>
         </div>
       </section>
@@ -820,6 +814,13 @@ export default async function HomePage() {
           position:   absolute;
           inset:      0;
           transition: transform 1.1s cubic-bezier(0.16,1,0.30,1);
+        }
+        .hp-cat-img {
+          width:       100%;
+          height:      100%;
+          object-fit:  cover;
+          object-position: center;
+          display:     block;
         }
         .hp-cat-large:hover  .hp-cat-bg,
         .hp-cat-small:hover  .hp-cat-bg  { transform: scale(1.06); }
@@ -1272,9 +1273,14 @@ export default async function HomePage() {
           text-decoration: none;
         }
         .hp-mood-bg {
-          position:   absolute;
-          inset:      0;
-          transition: transform 1.1s cubic-bezier(0.16,1,0.30,1);
+          position:    absolute;
+          inset:       0;
+          width:       100%;
+          height:      100%;
+          object-fit:  cover;
+          object-position: center;
+          display:     block;
+          transition:  transform 1.1s cubic-bezier(0.16,1,0.30,1);
         }
         .hp-mood-card:hover .hp-mood-bg { transform: scale(1.05); }
 
@@ -1549,16 +1555,16 @@ export default async function HomePage() {
 
 // ─── Sub-components ────────────────────────────────────────────────────────────
 
-function GalleryCell({ bg, wide = false }: { bg: string; wide?: boolean }) {
+function GalleryCell({ img, alt, wide = false }: { img: string; alt: string; wide?: boolean }) {
   return (
-    <div className="hp-gallery-cell" style={{ background: bg }}>
+    <div className="hp-gallery-cell">
+      <img
+        src={img}
+        alt={alt}
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: "center", display: "block" }}
+      />
       <div className="hp-gallery-cell-inner">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(201,169,110,0.35)" strokeWidth="0.8">
-          <rect x="2" y="2" width="20" height="20" rx="5" />
-          <circle cx="12" cy="12" r="4.5" />
-          <circle cx="17.5" cy="6.5" r="0.8" fill="rgba(201,169,110,0.35)" stroke="none" />
-        </svg>
-        <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.38rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(201,169,110,0.3)" }}>@covora</span>
+        <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.38rem", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.55)", background: "rgba(4,3,6,0.45)", padding: "0.3rem 0.65rem" }}>@covora</span>
       </div>
     </div>
   );
