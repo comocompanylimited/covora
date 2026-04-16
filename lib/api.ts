@@ -255,7 +255,20 @@ export async function fetchProduct(slug: string): Promise<ProductDetail | null> 
 export async function fetchCategory(slug: string): Promise<Product[]> {
   try {
     const data = await apiFetch(`/categories/${slug}`)
-    return unwrap(data).map(normalizeProduct)
+    const products = unwrap(data).map(normalizeProduct)
+    if (products.length > 0) return products
+    // Backend returned empty — fall through to client-side filter
+  } catch { /* fall through */ }
+
+  // Fallback: fetch all products and filter by category slug / name
+  try {
+    const all = await fetchProducts({ limit: 200 })
+    const norm = slug.toLowerCase().replace(/[-_\s]+/g, "")
+    return all.filter((p) => {
+      const cs = (p.categorySlug ?? "").toLowerCase().replace(/[-_\s]+/g, "")
+      const cn = (p.category ?? "").toLowerCase().replace(/[-_\s]+/g, "")
+      return cs === norm || cn === norm || cs.includes(norm) || norm.includes(cs)
+    })
   } catch {
     return []
   }

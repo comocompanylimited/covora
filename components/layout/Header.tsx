@@ -193,15 +193,43 @@ export default function Header() {
             transition: "height 0.5s var(--ease-out-expo)",
           }}
         >
-          {/* Menu trigger — all breakpoints */}
+          {/* Menu trigger — mobile only on lg+, always on smaller */}
           <button
-            className="relative z-10 flex flex-col gap-[5px] p-2 -ml-2"
+            className="relative z-10 flex flex-col gap-[5px] p-2 -ml-2 lg:hidden"
             onClick={() => setMobileOpen(true)}
             aria-label="Open menu"
           >
             <span style={{ display: "block", width: "22px", height: "1px", background: isSolid ? "#333333" : "var(--ivory)", transition: "all 0.3s ease" }} />
             <span style={{ display: "block", width: "14px", height: "1px", background: isSolid ? "var(--gold-dark)" : "var(--gold)", transition: "all 0.3s ease" }} />
           </button>
+
+          {/* Hamburger for lg — keeps full menu accessible */}
+          <button
+            className="relative z-10 hidden lg:flex flex-col gap-[5px] p-2 -ml-2"
+            onClick={() => setMobileOpen(true)}
+            aria-label="Open menu"
+          >
+            <span style={{ display: "block", width: "18px", height: "1px", background: isSolid ? "#BBBBBB" : "rgba(244,239,230,0.5)", transition: "all 0.3s ease" }} />
+            <span style={{ display: "block", width: "11px", height: "1px", background: isSolid ? "var(--gold-dark)" : "var(--gold)", opacity: 0.7, transition: "all 0.3s ease" }} />
+          </button>
+
+          {/* Desktop nav ─────────────────────────────── */}
+          <nav
+            className="hidden lg:flex items-center"
+            style={{ gap: "clamp(1rem, 1.8vw, 1.75rem)", marginLeft: "clamp(1rem, 1.5vw, 1.5rem)" }}
+          >
+            {NAV_LEFT.map((item) => (
+              <NavItem
+                key={item.label}
+                item={item}
+                active={pathname === item.href}
+                menuActive={activeMenu === item.label}
+                onEnter={() => openMenu(item.label)}
+                onLeave={closeMenu}
+                solid={isSolid}
+              />
+            ))}
+          </nav>
 
           {/* Centre logo */}
           <div className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 z-10">
@@ -228,9 +256,27 @@ export default function Header() {
             </Link>
           </div>
 
+          {/* Desktop right nav (Collections + Sale) */}
+          <nav
+            className="hidden lg:flex items-center ml-auto"
+            style={{ gap: "clamp(1rem, 1.8vw, 1.75rem)", marginRight: "clamp(1rem, 1.5vw, 1.5rem)" }}
+          >
+            {NAV_RIGHT.map((item) => (
+              <NavItem
+                key={item.label}
+                item={item}
+                active={pathname === item.href}
+                menuActive={activeMenu === item.label}
+                onEnter={() => openMenu(item.label)}
+                onLeave={closeMenu}
+                solid={isSolid}
+              />
+            ))}
+          </nav>
+
           {/* Actions */}
           <div
-            className="flex items-center ml-auto"
+            className="flex items-center lg:ml-0 ml-auto"
             style={{ gap: "clamp(0.85rem, 1.4vw, 1.5rem)" }}
             onMouseEnter={() => setActiveMenu(null)}
           >
@@ -304,14 +350,19 @@ function NavItem({
   menuActive,
   onEnter,
   onLeave,
+  solid = true,
 }: {
   item:       NavItem;
   active:     boolean;
   menuActive: boolean;
   onEnter:    () => void;
   onLeave:    () => void;
+  solid?:     boolean;
 }) {
-  const isActive = active || menuActive;
+  const isActive    = active || menuActive;
+  const baseColor   = solid ? "#666666" : "rgba(244,239,230,0.8)";
+  const hoverColor  = solid ? "#111111" : "var(--ivory)";
+  const activeColor = "var(--gold-dark)";
 
   return (
     <div
@@ -323,22 +374,23 @@ function NavItem({
         href={item.href}
         style={{
           fontFamily:    "var(--font-inter)",
-          fontSize:      "0.6rem",
+          fontSize:      "0.58rem",
           fontWeight:    500,
-          letterSpacing: "0.2em",
+          letterSpacing: "0.18em",
           textTransform: "uppercase",
-          color:         isActive ? "var(--gold)" : "var(--warm-grey)",
+          color:         isActive ? activeColor : baseColor,
           textDecoration:"none",
           position:      "relative",
           paddingBottom: "2px",
           display:       "inline-block",
           transition:    "color var(--transition-fast)",
+          whiteSpace:    "nowrap",
         }}
         onMouseEnter={(e) => {
-          if (!isActive) (e.currentTarget as HTMLElement).style.color = "var(--off-white)";
+          if (!isActive) (e.currentTarget as HTMLElement).style.color = hoverColor;
         }}
         onMouseLeave={(e) => {
-          if (!isActive) (e.currentTarget as HTMLElement).style.color = "var(--warm-grey)";
+          if (!isActive) (e.currentTarget as HTMLElement).style.color = baseColor;
         }}
       >
         {item.label}
