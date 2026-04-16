@@ -11,10 +11,10 @@ const SIZES   = ["XS", "S", "M", "L", "XL", "XXL"];
 const COLOURS = ["Black", "Ivory", "Nude", "Navy", "Camel", "Burgundy"];
 
 const PRICE_RANGES = [
-  { label: "Under £300",  min: 0,   max: 299 },
-  { label: "£300 – £500", min: 300, max: 499 },
-  { label: "£500 – £700", min: 500, max: 699 },
-  { label: "Over £700",   min: 700, max: Infinity },
+  { label: "Under £50",    min: 0,   max: 49 },
+  { label: "£50 – £150",  min: 50,  max: 149 },
+  { label: "£150 – £300", min: 150, max: 299 },
+  { label: "Over £300",   min: 300, max: Infinity },
 ];
 
 const SORT_OPTIONS = [
@@ -59,7 +59,7 @@ export function ShopClient({
   const [saleOnly,   setSaleOnly]   = useState(false);
   const [sortBy,     setSortBy]     = useState("featured");
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [visible,    setVisible]    = useState(8);
+  const [visible,    setVisible]    = useState(24);
 
   // Derived category list
   const catList = categories ?? Array.from(new Set(products.map((p) => p.category))).sort();
@@ -89,7 +89,7 @@ export function ShopClient({
   const activeCount = sizes.length + colours.length + (priceKey ? 1 : 0) + (saleOnly ? 1 : 0);
 
   function clearAll() {
-    setSizes([]); setColours([]); setPriceKey(""); setSaleOnly(false); setVisible(8);
+    setSizes([]); setColours([]); setPriceKey(""); setSaleOnly(false); setVisible(24);
   }
 
   // ── Filter panel (shared by sidebar + drawer) ───────────────────────────────
@@ -157,7 +157,7 @@ export function ShopClient({
           {PRICE_RANGES.map((range) => (
             <button
               key={range.label}
-              onClick={() => { setPriceKey(priceKey === range.label ? "" : range.label); setVisible(8); }}
+              onClick={() => { setPriceKey(priceKey === range.label ? "" : range.label); setVisible(24); }}
               style={{ display: "flex", alignItems: "center", gap: "0.7rem", background: "none", border: "none", cursor: "pointer", padding: "0.12rem 0", textAlign: "left" }}
             >
               <span style={{ width: "14px", height: "14px", flexShrink: 0, border: `1.5px solid ${priceKey === range.label ? "var(--gold-dark)" : "rgba(0,0,0,0.15)"}`, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -172,7 +172,7 @@ export function ShopClient({
       {/* Availability */}
       <FilterSection title="Availability" last>
         <button
-          onClick={() => { setSaleOnly(!saleOnly); setVisible(8); }}
+          onClick={() => { setSaleOnly(!saleOnly); setVisible(24); }}
           style={{ display: "flex", alignItems: "center", gap: "0.7rem", background: "none", border: "none", cursor: "pointer", padding: "0.12rem 0", textAlign: "left" }}
         >
           <span style={{ width: "14px", height: "14px", flexShrink: 0, border: `1px solid ${saleOnly ? "#111111" : "rgba(0,0,0,0.15)"}`, background: saleOnly ? "#111111" : "transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -227,7 +227,7 @@ export function ShopClient({
               </h1>
             </div>
             <div className="sc-sort-desktop">
-              <SortControl value={sortBy} onChange={(v) => { setSortBy(v); setVisible(8); }} />
+              <SortControl value={sortBy} onChange={(v) => { setSortBy(v); setVisible(24); }} />
             </div>
           </div>
         </div>
@@ -245,7 +245,7 @@ export function ShopClient({
           Filter{activeCount > 0 ? ` (${activeCount})` : ""}
         </button>
         <div style={{ flex: 1 }}>
-          <SortControl value={sortBy} onChange={(v) => { setSortBy(v); setVisible(8); }} compact />
+          <SortControl value={sortBy} onChange={(v) => { setSortBy(v); setVisible(24); }} compact />
         </div>
       </div>
 
@@ -316,7 +316,7 @@ export function ShopClient({
           {/* Load more */}
           {hasMore && (
             <div style={{ textAlign: "center", marginTop: "clamp(2.5rem, 4vw, 4rem)" }}>
-              <button onClick={() => setVisible((v) => v + 8)} className="btn btn-inverse btn-md">
+              <button onClick={() => setVisible((v) => v + 24)} className="btn btn-inverse btn-md">
                 Load More
               </button>
               <p style={{ fontFamily: "var(--font-inter)", fontSize: "0.58rem", color: "#999999", marginTop: "0.85rem", letterSpacing: "0.06em" }}>
