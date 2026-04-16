@@ -7,8 +7,6 @@ import type { Product as MockProduct } from "@/lib/api";
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
-const SIZES   = ["XS", "S", "M", "L", "XL", "XXL"];
-const COLOURS = ["Black", "Ivory", "Nude", "Navy", "Camel", "Burgundy"];
 
 const PRICE_RANGES = [
   { label: "Under £50",    min: 0,   max: 49 },
@@ -53,20 +51,25 @@ export function ShopClient({
   hideCategories = false,
   categories,
 }: ShopClientProps) {
-  const [sizes,      setSizes]      = useState<string[]>([]);
-  const [colours,    setColours]    = useState<string[]>([]);
-  const [priceKey,   setPriceKey]   = useState("");
-  const [saleOnly,   setSaleOnly]   = useState(false);
-  const [sortBy,     setSortBy]     = useState("featured");
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [visible,    setVisible]    = useState(24);
+  const [selectedCats, setSelectedCats] = useState<string[]>([]);
+  const [priceKey,     setPriceKey]     = useState("");
+  const [saleOnly,     setSaleOnly]     = useState(false);
+  const [sortBy,       setSortBy]       = useState("featured");
+  const [drawerOpen,   setDrawerOpen]   = useState(false);
+  const [visible,      setVisible]      = useState(24);
 
-  // Derived category list
-  const catList = categories ?? Array.from(new Set(products.map((p) => p.category))).sort();
+  // Derived category list — use prop or derive from products
+  const catList = categories ?? Array.from(
+    new Set(products.map((p) => p.category).filter(Boolean))
+  ).sort();
 
   // Filtered + sorted
   const filtered = useMemo(() => {
     let list = [...products];
+
+    if (selectedCats.length > 0) {
+      list = list.filter((p) => selectedCats.includes(p.category));
+    }
 
     if (priceKey) {
       const range = PRICE_RANGES.find((r) => r.label === priceKey);
@@ -82,14 +85,14 @@ export function ShopClient({
     if (sortBy === "price-desc") list.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
 
     return list;
-  }, [products, priceKey, saleOnly, sortBy]);
+  }, [products, selectedCats, priceKey, saleOnly, sortBy]);
 
   const displayed  = filtered.slice(0, visible);
   const hasMore    = visible < filtered.length;
-  const activeCount = sizes.length + colours.length + (priceKey ? 1 : 0) + (saleOnly ? 1 : 0);
+  const activeCount = selectedCats.length + (priceKey ? 1 : 0) + (saleOnly ? 1 : 0);
 
   function clearAll() {
-    setSizes([]); setColours([]); setPriceKey(""); setSaleOnly(false); setVisible(24);
+    setSelectedCats([]); setPriceKey(""); setSaleOnly(false); setVisible(24);
   }
 
   // ── Filter panel (shared by sidebar + drawer) ───────────────────────────────
@@ -111,45 +114,23 @@ export function ShopClient({
         )}
       </div>
 
-      {/* Size */}
-      <FilterSection title="Size">
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "0.4rem" }}>
-          {SIZES.map((s) => (
-            <button
-              key={s}
-              onClick={() => setSizes((prev) => prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s])}
-              style={{
-                fontFamily:    "var(--font-inter)",
-                fontSize:      "0.58rem",
-                fontWeight:    500,
-                letterSpacing: "0.06em",
-                padding:       "0.38rem 0.65rem",
-                border:        `1px solid ${sizes.includes(s) ? "#111111" : "rgba(0,0,0,0.12)"}`,
-                background:    sizes.includes(s) ? "#111111" : "transparent",
-                color:         sizes.includes(s) ? "#ffffff" : "#666666",
-                cursor:        "pointer",
-                transition:    "all 0.18s ease",
-              }}
-            >{s}</button>
-          ))}
-        </div>
-      </FilterSection>
-
-      {/* Colour */}
-      <FilterSection title="Colour">
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
-          {COLOURS.map((col) => (
-            <button
-              key={col}
-              onClick={() => setColours((prev) => prev.includes(col) ? prev.filter((x) => x !== col) : [...prev, col])}
-              style={{ display: "flex", alignItems: "center", gap: "0.7rem", background: "none", border: "none", cursor: "pointer", padding: "0.12rem 0", textAlign: "left" }}
-            >
-              <span style={{ width: "14px", height: "14px", flexShrink: 0, border: `1.5px solid ${colours.includes(col) ? "#111111" : "rgba(0,0,0,0.15)"}`, background: colours.includes(col) ? "#111111" : "transparent", borderRadius: "50%", display: "inline-block" }} />
-              <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.73rem", color: colours.includes(col) ? "#111111" : "#666666" }}>{col}</span>
-            </button>
-          ))}
-        </div>
-      </FilterSection>
+      {/* Category */}
+      {!hideCategories && catList.length > 0 && (
+        <FilterSection title="Category">
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+            {catList.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => { setSelectedCats((prev) => prev.includes(cat) ? prev.filter((x) => x !== cat) : [...prev, cat]); setVisible(24); }}
+                style={{ display: "flex", alignItems: "center", gap: "0.7rem", background: "none", border: "none", cursor: "pointer", padding: "0.12rem 0", textAlign: "left" }}
+              >
+                <span style={{ width: "14px", height: "14px", flexShrink: 0, border: `1.5px solid ${selectedCats.includes(cat) ? "#111111" : "rgba(0,0,0,0.15)"}`, background: selectedCats.includes(cat) ? "#111111" : "transparent", borderRadius: "2px", display: "inline-block" }} />
+                <span style={{ fontFamily: "var(--font-inter)", fontSize: "0.73rem", color: selectedCats.includes(cat) ? "#111111" : "#666666" }}>{cat}</span>
+              </button>
+            ))}
+          </div>
+        </FilterSection>
+      )}
 
       {/* Price */}
       <FilterSection title="Price">

@@ -134,7 +134,12 @@ function unwrap(data: unknown): ApiRaw[] {
 }
 
 function normalizeProduct(raw: ApiRaw): Product {
-  const { name: category, slug: categorySlug } = getCategory(raw)
+  let { name: category, slug: categorySlug } = getCategory(raw)
+  // CJ products have no category relationship — fall back to short_description
+  if (!category && raw.short_description) {
+    category = String(raw.short_description)
+    categorySlug = category.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "")
+  }
   const src = getImageSrc(raw)
   const { price, originalPrice } = getSaleInfo(raw)
   return {
