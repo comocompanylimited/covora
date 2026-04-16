@@ -270,6 +270,7 @@ const SLUG_TO_CJ_CATEGORIES: Record<string, string[]> = {
   "co-ords":    ["Tops & Sets", "Bottoms"],
   swimwear:     ["Tops & Sets"],
   activewear:   ["Tops & Sets", "Bottoms"],
+  denim:        ["Bottoms"],
   loungewear:   ["Tops & Sets", "Bottoms"],
   lingerie:     ["Tops & Sets"],
   clothing:     ["Tops & Sets", "Bottoms", "Outerwear & Jackets", "Weddings & Events"],
