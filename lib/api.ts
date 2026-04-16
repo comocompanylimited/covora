@@ -259,16 +259,56 @@ export async function fetchProduct(slug: string): Promise<ProductDetail | null> 
   }
 }
 
+// Maps Covora nav slugs → CJ short_description values stored on products
+const SLUG_TO_CJ_CATEGORIES: Record<string, string[]> = {
+  dresses:      ["Weddings & Events", "Tops & Sets"],
+  tops:         ["Tops & Sets"],
+  bottoms:      ["Bottoms"],
+  outerwear:    ["Outerwear & Jackets"],
+  knitwear:     ["Tops & Sets"],
+  "co-ords":    ["Tops & Sets", "Bottoms"],
+  swimwear:     ["Tops & Sets"],
+  activewear:   ["Tops & Sets", "Bottoms"],
+  loungewear:   ["Tops & Sets", "Bottoms"],
+  lingerie:     ["Tops & Sets"],
+  clothing:     ["Tops & Sets", "Bottoms", "Outerwear & Jackets", "Weddings & Events"],
+  accessories:  ["Accessories", "Hair & Accessories", "Nail Art & Tools"],
+  jewellery:    ["Fashion Jewelry", "Fine Jewelry", "Wedding & Engagement", "Women's Watches"],
+  jewelry:      ["Fashion Jewelry", "Fine Jewelry", "Wedding & Engagement", "Women's Watches"],
+  scarves:      ["Accessories"],
+  bags:         ["Women's Luggage & Bags"],
+  totes:        ["Women's Luggage & Bags"],
+  clutches:     ["Women's Luggage & Bags"],
+  crossbody:    ["Women's Luggage & Bags"],
+  "mini-bags":  ["Women's Luggage & Bags"],
+  "shoes-bags": ["Women's Shoes", "Women's Luggage & Bags"],
+  heels:        ["Women's Shoes"],
+  flats:        ["Women's Shoes"],
+  boots:        ["Women's Shoes"],
+  sandals:      ["Women's Shoes"],
+  sneakers:     ["Women's Shoes"],
+  mules:        ["Women's Shoes"],
+  beauty:       ["Skin Care", "Makeup", "Beauty Tools", "Nail Art & Tools", "Wigs & Extensions", "Hair & Accessories"],
+  skincare:     ["Skin Care"],
+  makeup:       ["Makeup"],
+  hair:         ["Hair & Accessories", "Wigs & Extensions"],
+}
+
 export async function fetchCategory(slug: string): Promise<Product[]> {
   try {
-    // Fetch all products and filter client-side by categorySlug
     const data = await apiFetch("/store/products?page_size=100")
     const all = unwrap(data).map(normalizeProduct)
-    const filtered = all.filter(
-      (p) => p.categorySlug === slug || p.category.toLowerCase().replace(/\s+/g, "-") === slug
-    )
-    if (filtered.length > 0) return filtered
-    if (all.length > 0) return all  // show everything if no category match
+
+    // Try exact categorySlug match first
+    const exactMatch = all.filter((p) => p.categorySlug === slug)
+    if (exactMatch.length > 0) return exactMatch
+
+    // Try CJ category mapping
+    const cjCats = SLUG_TO_CJ_CATEGORIES[slug]
+    if (cjCats) {
+      const mapped = all.filter((p) => cjCats.includes(p.category))
+      if (mapped.length > 0) return mapped
+    }
   } catch { /* fall through */ }
 
   return []
