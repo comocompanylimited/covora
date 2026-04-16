@@ -7,15 +7,235 @@ import { ProductCard } from "@/components/ui/Card";
 import type { Product as MockProduct } from "@/lib/api";
 import { useCart } from "@/store/cart";
 
-// Safe description renderer — strips HTML tags, normalises whitespace
-function useCleanDescription(raw: string) {
+// ─── Premium title cleanup ─────────────────────────────────────────────────
+function cleanProductTitle(raw: string): string {
+  let t = raw
+    // Remove common CJ noise patterns
+    .replace(/\bself[-\s]?pickup\b/gi, "")
+    .replace(/\bsell\s+well\b/gi, "")
+    .replace(/\bfree\s+shipping\b/gi, "")
+    .replace(/\bhot\s+sale\b/gi, "")
+    .replace(/\bnew\s+arrival\b/gi, "")
+    .replace(/\bfashion\s+new\b/gi, "")
+    // Strip trailing SKU-like codes (all-caps sequences, digits, hyphens)
+    .replace(/[\s_-]+[A-Z0-9]{4,}[\s_-]*[A-Z0-9]*$/g, "")
+    // Strip bracketed sizes/colors at end
+    .replace(/\s*[\[\(][^\]\)]{0,30}[\]\)]\s*$/g, "")
+    // Remove "Women's" / "Women" / "Lady" prefix when redundant
+    .replace(/^(Women'?s?|Lady|Ladies|Female)\s+/i, "")
+    // Strip CJ separator bars
+    .replace(/\s*[|｜]\s*.*/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  // Title-case the result if it's all-caps
+  if (t === t.toUpperCase() && t.length > 3) {
+    t = t.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+  }
+  return t || raw.trim();
+}
+
+// ─── Premium description generator ────────────────────────────────────────
+const FABRIC_KEYWORDS: Record<string, string> = {
+  lace: "intricate lace detailing",
+  satin: "lustrous satin",
+  velvet: "sumptuous velvet",
+  silk: "fluid silk",
+  chiffon: "lightweight chiffon",
+  cashmere: "ultra-soft cashmere",
+  knit: "fine-gauge knit",
+  cotton: "breathable premium cotton",
+  denim: "premium denim",
+  leather: "refined leather",
+  suede: "supple suede",
+  linen: "crisp linen",
+  tulle: "delicate tulle layers",
+  sequin: "hand-applied sequin embellishment",
+  embroid: "intricate embroidery",
+  mesh: "sheer mesh panelling",
+};
+
+const STYLE_KEYWORDS: Record<string, string> = {
+  "wrap": "a flattering wrap silhouette",
+  "bodycon": "a sculpting bodycon cut",
+  "flare": "a graceful flared hem",
+  "a-line": "a classic A-line silhouette",
+  "midi": "an elegant midi length",
+  "maxi": "a sweeping maxi length",
+  "mini": "a chic mini length",
+  "oversized": "an effortlessly oversized fit",
+  "fitted": "a tailored fitted cut",
+  "flowy": "a romantic flowing drape",
+  "ruched": "a signature ruched finish",
+  "pleated": "refined pleating",
+  "asymmetr": "an architectural asymmetric hem",
+  "backless": "a daring open-back design",
+  "off-shoulder": "a sophisticated off-shoulder neckline",
+  "one-shoulder": "a sleek one-shoulder neckline",
+  "v-neck": "a flattering V-neckline",
+  "halter": "a refined halter neckline",
+};
+
+const OCCASION_KEYWORDS: Record<string, string> = {
+  "cocktail": "cocktail events",
+  "evening": "evenings out",
+  "banquet": "formal occasions",
+  "party": "celebrations",
+  "office": "the office",
+  "work": "the workplace",
+  "casual": "everyday styling",
+  "beach": "sun-filled days",
+  "wedding": "weddings and formal ceremonies",
+  "prom": "prom and black-tie events",
+  "brunch": "weekend brunches",
+  "date": "date nights",
+};
+
+const CATEGORY_CLOSINGS: Record<string, string> = {
+  "Dresses":        "Wear alone or layer with a tailored blazer for effortless day-to-evening dressing.",
+  "Tops & Blouses": "Pairs perfectly with wide-leg trousers or your favourite denim for a polished finish.",
+  "Knitwear":       "A wardrobe staple that transitions seamlessly from season to season.",
+  "Co-ords":        "Wear as a set for instant impact, or mix with separates for a fresh take.",
+  "Outerwear":      "The finishing touch to elevate every outfit, season after season.",
+  "Loungewear":     "Luxuriously comfortable without compromising on style — effortless from morning to night.",
+  "Bottoms":        "A refined essential that pairs with everything in your wardrobe.",
+  "Denim":          "The perfect blend of casual cool and considered style.",
+  "Heels":          "Elevate any look with these sophisticated heels — designed for the modern woman.",
+  "Flats":          "Combine comfort with elegance — a pair you will reach for daily.",
+  "Boots":          "From polished to relaxed, these boots anchor any outfit with quiet confidence.",
+  "Sneakers":       "Where comfort meets contemporary style — an everyday essential.",
+  "Sandals":        "The perfect warm-weather companion for effortless, sun-ready style.",
+  "Mules":          "Slip on and step out — minimal effort, maximum polish.",
+  "Tote Bags":      "Roomy enough for your essentials, refined enough for any occasion.",
+  "Crossbody Bags": "A hands-free silhouette that moves with you through every moment of the day.",
+  "Clutches":       "The perfect evening companion — sleek, compact and always in style.",
+  "Shoulder Bags":  "A timeless style that adds polish to both casual and dressed-up looks.",
+  "Jewellery":      "A finishing touch that speaks volumes — wear alone or layer to curate your signature look.",
+  "Scarves":        "Draped, tied or wrapped — a versatile piece that defines the look.",
+  "Accessories":    "The detail that makes the difference — a considered finishing touch.",
+  "Skincare":       "Formulated with skin-loving ingredients to illuminate your natural radiance.",
+  "Makeup":         "Designed to enhance your natural beauty with effortless, buildable coverage.",
+  "Hair":           "Salon-quality results from the comfort of your own home.",
+};
+
+function usePremiumDescription(name: string, category: string, rawDescription: string): string {
   return useMemo(() => {
-    if (!raw) return "";
-    // Strip HTML tags
-    const stripped = raw.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"');
-    // Collapse whitespace
-    return stripped.replace(/\s+/g, " ").trim();
-  }, [raw]);
+    const n = name.toLowerCase();
+
+    // Find fabric
+    let fabric = "";
+    for (const [kw, label] of Object.entries(FABRIC_KEYWORDS)) {
+      if (n.includes(kw)) { fabric = label; break; }
+    }
+
+    // Find style
+    let style = "";
+    for (const [kw, label] of Object.entries(STYLE_KEYWORDS)) {
+      if (n.includes(kw)) { style = label; break; }
+    }
+
+    // Find occasion
+    let occasion = "";
+    for (const [kw, label] of Object.entries(OCCASION_KEYWORDS)) {
+      if (n.includes(kw)) { occasion = label; break; }
+    }
+
+    const closing = CATEGORY_CLOSINGS[category] ?? "A carefully considered piece that earns a permanent place in a curated wardrobe.";
+
+    // Build opening sentence
+    let opening = "";
+    if (fabric && style) {
+      opening = `Crafted from ${fabric} and cut to ${style}, this piece effortlessly balances artistry with wearability.`;
+    } else if (fabric) {
+      opening = `Crafted from ${fabric}, this piece is designed for the woman who values both quality and refined style.`;
+    } else if (style) {
+      opening = `Designed with ${style}, this piece flatters the silhouette with understated elegance.`;
+    } else {
+      // Fall back: try to extract a descriptive phrase from the raw CJ description
+      const stripped = rawDescription.replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+      const firstSentence = stripped.split(/[.!?]/)[0]?.trim() ?? "";
+      if (firstSentence.length > 20 && firstSentence.length < 200) {
+        opening = firstSentence + ".";
+      } else {
+        opening = "A meticulously crafted piece that reflects Covora's commitment to luxury, quality and considered design.";
+      }
+    }
+
+    // Middle sentence
+    let middle = "";
+    if (occasion) {
+      middle = `Ideal for ${occasion}, it offers a versatile elegance that reads equally well dressed up or down.`;
+    } else {
+      middle = "Versatile enough for both elevated everyday dressing and special occasions alike.";
+    }
+
+    return `${opening} ${middle} ${closing}`;
+  }, [name, category, rawDescription]);
+}
+
+// ─── Premium details bullets ───────────────────────────────────────────────
+function usePremiumDetails(name: string, category: string, rawDetails: string[]): string[] {
+  return useMemo(() => {
+    const n = name.toLowerCase();
+    const bullets: string[] = [];
+
+    // Category-specific first bullet
+    const catBullet: Record<string, string> = {
+      "Dresses":        "Expertly constructed for a flawless fit and flowing silhouette",
+      "Tops & Blouses": "Considered cut designed to flatter and move with the body",
+      "Knitwear":       "Fine-gauge construction for warmth without bulk",
+      "Co-ords":        "Designed as a matching set — worn together or mixed with key separates",
+      "Outerwear":      "Structured outer layer designed to finish any look with polish",
+      "Loungewear":     "Ultra-soft fabrication for luxurious comfort at home or on the go",
+      "Bottoms":        "Refined cut designed to sit smoothly and elongate the leg",
+      "Denim":          "Premium denim construction with authentic washes and finishes",
+      "Heels":          "Elevated heel crafted for all-day wearability without compromise",
+      "Flats":          "Cushioned footbed for comfort from morning to night",
+      "Boots":          "Durable construction with premium finishing details",
+      "Sneakers":       "Lightweight sole engineered for all-day comfort",
+      "Sandals":        "Adjustable straps for a secure, personalised fit",
+      "Mules":          "Slip-on ease with an elegant, fashion-forward silhouette",
+      "Tote Bags":      "Spacious main compartment with interior organisation pockets",
+      "Crossbody Bags": "Adjustable crossbody strap for versatile, hands-free carrying",
+      "Clutches":       "Compact silhouette holds your evening essentials with ease",
+      "Shoulder Bags":  "Top-carry handles and removable strap for versatile styling",
+      "Jewellery":      "Precision-crafted with high-quality metals and stones",
+      "Scarves":        "Generously sized for multiple styling options",
+      "Accessories":    "Thoughtfully crafted detail to complete any look",
+      "Skincare":       "Dermatologist-tested formula suitable for all skin types",
+      "Makeup":         "Long-wearing formula for all-day confidence",
+      "Hair":           "Professional-grade finish for salon-worthy results",
+    };
+
+    bullets.push(catBullet[category] ?? "Exceptional attention to quality and finishing detail");
+
+    // Fabric/material bullet
+    for (const [kw, label] of Object.entries(FABRIC_KEYWORDS)) {
+      if (n.includes(kw)) {
+        bullets.push(`${label.charAt(0).toUpperCase() + label.slice(1)} for a luxurious drape and feel`);
+        break;
+      }
+    }
+
+    // Feature bullets from name
+    if (n.includes("long sleeve") || n.includes("long-sleeve")) bullets.push("Long sleeves for elevated warmth and coverage");
+    else if (n.includes("short sleeve") || n.includes("short-sleeve")) bullets.push("Short sleeves for effortless warm-weather dressing");
+    else if (n.includes("sleeveless")) bullets.push("Sleeveless cut — perfect for layering or wearing alone");
+
+    if (n.includes("pocket")) bullets.push("Discreet pockets for practical, everyday ease");
+    if (n.includes("zip") || n.includes("zipper")) bullets.push("Concealed zip for a clean, seamless silhouette");
+    if (n.includes("button")) bullets.push("Button fastening for a refined, adjustable fit");
+    if (n.includes("elastic")) bullets.push("Elasticated waistband for a comfortable, adjustable fit");
+    if (n.includes("lining") || n.includes("lined")) bullets.push("Fully lined for a polished finish and comfortable wear");
+
+    // Pad to at least 2 bullets
+    if (bullets.length < 2) {
+      bullets.push("Premium quality materials and craftsmanship throughout");
+    }
+
+    // Don't exceed 4
+    return bullets.slice(0, 4);
+  }, [name, category, rawDetails]);
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -94,7 +314,9 @@ export function ProductDetailClient({ product, related }: Props) {
 
   const { addItem } = useCart();
   const hasSale = !!product.originalPrice;
-  const cleanDescription = useCleanDescription(product.description);
+  const displayName    = useMemo(() => cleanProductTitle(product.name), [product.name]);
+  const premiumDesc    = usePremiumDescription(product.name, product.category, product.description);
+  const premiumDetails = usePremiumDetails(product.name, product.category, product.details);
 
   function handleAddToCart() {
     if (!activeSize && product.sizes.length > 1) {
@@ -106,12 +328,12 @@ export function ProductDetailClient({ product, related }: Props) {
     const priceNum = parseFloat(product.price.replace(/[^0-9.]/g, "")) || 0;
     addItem({
       productId:          parseInt(product.id) || 1,
-      name:               product.name,
+      name:               displayName,
       slug:               product.slug,
       price:              priceNum,
       quantity:           qty,
       image:              product.images[0]?.src ?? "",
-      imageAlt:           product.name,
+      imageAlt:           displayName,
       selectedAttributes: {
         ...(activeSize  ? { Size:   activeSize  } : {}),
         ...(activeColor ? { Colour: activeColor } : {}),
@@ -145,7 +367,7 @@ export function ProductDetailClient({ product, related }: Props) {
           {[
             { label: "Home",           href: "/home" },
             { label: product.category, href: `/category/${product.categorySlug}` },
-            { label: product.name,     href: undefined },
+            { label: displayName,      href: undefined },
           ].map((crumb, i) => (
             <span key={i} style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
               {i > 0 && <span style={{ color: "#DDDDDD", fontSize: "0.6rem" }}>›</span>}
@@ -319,7 +541,7 @@ export function ProductDetailClient({ product, related }: Props) {
               lineHeight: 1.0, letterSpacing: "-0.015em",
               marginBottom: "1rem",
             }}>
-              {product.name}
+              {displayName}
             </h1>
 
             {/* Price row */}
@@ -369,7 +591,7 @@ export function ProductDetailClient({ product, related }: Props) {
               fontFamily: "var(--font-inter)", fontSize: "0.76rem",
               color: "#5A5A5A", lineHeight: 1.8, marginBottom: "1.75rem",
             }}>
-              {cleanDescription}
+              {premiumDesc}
             </p>
 
             {/* ── Colour ──────────────────────────────────────────── */}
@@ -567,7 +789,7 @@ export function ProductDetailClient({ product, related }: Props) {
             <div style={{ borderTop: "1px solid rgba(0,0,0,0.08)" }}>
               <Accordion title="Product Details" defaultOpen>
                 <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: "0.5rem" }}>
-                  {product.details.map((d, i) => (
+                  {premiumDetails.map((d, i) => (
                     <li key={i} style={{
                       fontFamily: "var(--font-inter)", fontSize: "0.7rem",
                       color: "#5A5A5A", lineHeight: 1.65,
