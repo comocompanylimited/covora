@@ -91,7 +91,8 @@ function getImageSrc(raw: ApiRaw): string | undefined {
   const imgs = raw.images
   if (Array.isArray(imgs) && imgs.length > 0) {
     const img = imgs[0] as ApiRaw
-    const src = img.src ?? img.url
+    // comodo-master-backend uses image_url; fallback to src/url
+    const src = img.image_url ?? img.src ?? img.url
     if (typeof src === "string" && src) return src
   }
   if (typeof raw.image === "string" && raw.image) return raw.image
@@ -209,11 +210,9 @@ function normalizeCollection(raw: ApiRaw): Collection {
 
 export async function fetchProducts(params: { limit?: number; sort?: string } = {}): Promise<Product[]> {
   const qs = new URLSearchParams()
-  if (params.limit) qs.set("limit", String(params.limit))
-  if (params.sort)  qs.set("sort",  params.sort)
-  const query = qs.toString()
+  if (params.limit) qs.set("page_size", String(params.limit))
   try {
-    const data = await apiFetch(`/products${query ? `?${query}` : ""}`)
+    const data = await apiFetch(`/store/products?${qs.toString()}`)
     const products = unwrap(data).map(normalizeProduct)
     if (products.length > 0) return products
   } catch { /* fall through */ }
@@ -222,9 +221,12 @@ export async function fetchProducts(params: { limit?: number; sort?: string } = 
 
 export async function fetchNewIn(): Promise<Product[]> {
   try {
-    const data = await apiFetch("/products?tag=new")
-    const products = unwrap(data).map(normalizeProduct)
-    if (products.length > 0) return products
+    // Fetch all and filter featured/new — backend has no tag filter on public endpoint
+    const data = await apiFetch("/store/products?page_size=100")
+    const all = unwrap(data).map(normalizeProduct)
+    const newItems = all.filter((p) => p.badge === "New")
+    if (newItems.length > 0) return newItems
+    if (all.length > 0) return all.slice(0, 8)
   } catch { /* fall through */ }
   return []
 }
@@ -236,7 +238,7 @@ export async function fetchAllProducts(): Promise<Product[]> {
 export async function searchProducts(query: string): Promise<Product[]> {
   if (!query.trim()) return []
   try {
-    const data = await apiFetch(`/search?q=${encodeURIComponent(query)}`)
+    const data = await apiFetch(`/store/products?search=${encodeURIComponent(query)}`)
     return unwrap(data).map(normalizeProduct)
   } catch {
     return []
@@ -245,7 +247,7 @@ export async function searchProducts(query: string): Promise<Product[]> {
 
 export async function fetchProduct(slug: string): Promise<ProductDetail | null> {
   try {
-    const data: ApiRaw = await apiFetch(`/products/${slug}`)
+    const data: ApiRaw = await apiFetch(`/store/products/${slug}`)
     return normalizeProductDetail(data)
   } catch {
     return null
@@ -254,10 +256,14 @@ export async function fetchProduct(slug: string): Promise<ProductDetail | null> 
 
 export async function fetchCategory(slug: string): Promise<Product[]> {
   try {
-    const data = await apiFetch(`/categories/${slug}`)
-    const products = unwrap(data).map(normalizeProduct)
-    if (products.length > 0) return products
-    // Backend returned empty — fall through to client-side filter
+    // Fetch all products and filter client-side by categorySlug
+    const data = await apiFetch("/store/products?page_size=100")
+    const all = unwrap(data).map(normalizeProduct)
+    const filtered = all.filter(
+      (p) => p.categorySlug === slug || p.category.toLowerCase().replace(/\s+/g, "-") === slug
+    )
+    if (filtered.length > 0) return filtered
+    if (all.length > 0) return all  // show everything if no category match
   } catch { /* fall through */ }
 
   return []
