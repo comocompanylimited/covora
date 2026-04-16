@@ -7,31 +7,74 @@ import { ProductCard } from "@/components/ui/Card";
 import type { Product as MockProduct } from "@/lib/api";
 import { useCart } from "@/store/cart";
 
-// ─── Premium title cleanup ─────────────────────────────────────────────────
+// ─── Professional title generator ─────────────────────────────────────────
+// CJ product names are often noisy marketing strings. This produces a concise,
+// professional title by stripping noise and keeping only descriptive content.
+
+// Marketing words that add no value to a title when they appear at the start
+// or are surrounded by more informative words.
+const _TITLE_NOISE_WORDS = [
+  "sexy", "hot", "new", "fashion", "casual", "classic", "vintage", "stylish",
+  "elegant", "trendy", "chic", "boho", "bohemian", "cute", "sweet",
+  "beautiful", "gorgeous", "lovely", "charming", "pretty",
+  "female", "ladies", "lady", "women's", "womens", "woman's",
+  "self-pickup", "self pickup", "sell well", "free shipping",
+  "hot sale", "new arrival", "fashion new", "best seller",
+  "high quality", "high-quality", "luxury", "premium", "good quality",
+];
+
+// Known CJ brand names / store names to strip
+const _BRAND_NOISE = [
+  "yoins", "zaful", "shein", "romwe", "dresslily", "rosegal",
+  "tbdress", "tidebuy", "sammydress", "floryday", "milanoo",
+];
+
 function cleanProductTitle(raw: string): string {
-  let t = raw
-    // Remove common CJ noise patterns
-    .replace(/\bself[-\s]?pickup\b/gi, "")
-    .replace(/\bsell\s+well\b/gi, "")
-    .replace(/\bfree\s+shipping\b/gi, "")
-    .replace(/\bhot\s+sale\b/gi, "")
-    .replace(/\bnew\s+arrival\b/gi, "")
-    .replace(/\bfashion\s+new\b/gi, "")
-    // Strip trailing SKU-like codes (all-caps sequences, digits, hyphens)
-    .replace(/[\s_-]+[A-Z0-9]{4,}[\s_-]*[A-Z0-9]*$/g, "")
-    // Strip bracketed sizes/colors at end
-    .replace(/\s*[\[\(][^\]\)]{0,30}[\]\)]\s*$/g, "")
-    // Remove "Women's" / "Women" / "Lady" prefix when redundant
-    .replace(/^(Women'?s?|Lady|Ladies|Female)\s+/i, "")
-    // Strip CJ separator bars
-    .replace(/\s*[|｜]\s*.*/g, "")
-    .replace(/\s+/g, " ")
+  if (!raw?.trim()) return raw;
+
+  let t = raw.trim()
+    // Strip everything after a pipe/bar separator (CJ often adds model codes after |)
+    .replace(/\s*[|｜/／]\s*.+$/g, "")
+    // Strip bracketed content at end (sizes, colour codes, model numbers)
+    .replace(/[\s_-]*[\[\(（【][^\]\)）】]{0,40}[\]\)）】]\s*$/g, "")
+    // Strip trailing ALL-CAPS code sequences (SKUs like ABCD1234, CJXXXX)
+    .replace(/\s+[A-Z]{2,}[\d-]{2,}[A-Z\d-]*$/g, "")
+    .replace(/\s+CJ[A-Z0-9-]+$/gi, "")
+    // Strip trailing standalone numbers (sizes, item codes)
+    .replace(/\s+#?\d{4,}$/g, "")
+    // Remove CJ store/brand names
+    .replace(new RegExp(`\\b(${_BRAND_NOISE.join("|")})\\b`, "gi"), "")
+    // Remove leading "Women's" / "Ladies'" (the whole store is women's)
+    .replace(/^(Women'?s?|Womens|Lady|Ladies|Female|Girls?)\s+/i, "")
+    // Remove noise marketing words from the start only
+    .replace(
+      new RegExp(`^(${_TITLE_NOISE_WORDS.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\s+`, "gi"),
+      ""
+    )
+    // Clean up punctuation artefacts
+    .replace(/^[,\-–—\s]+/, "")
+    .replace(/[,\-–—\s]+$/, "")
+    .replace(/\s{2,}/g, " ")
     .trim();
 
-  // Title-case the result if it's all-caps
-  if (t === t.toUpperCase() && t.length > 3) {
-    t = t.replace(/\w\S*/g, (w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+  // Enforce a reasonable max length — cut at a word boundary around 60 chars
+  if (t.length > 65) {
+    const cut = t.lastIndexOf(" ", 62);
+    t = cut > 20 ? t.slice(0, cut).replace(/[,\-–—\s]+$/, "") : t.slice(0, 62);
   }
+
+  // Title-case if entirely lowercase or entirely uppercase
+  const isAllCaps = t === t.toUpperCase() && /[A-Z]/.test(t);
+  const isAllLower = t === t.toLowerCase() && /[a-z]/.test(t);
+  if (isAllCaps || isAllLower) {
+    t = t
+      .toLowerCase()
+      .replace(/(?:^|\s)\S/g, (ch) => ch.toUpperCase())
+      // Keep small words lowercase unless at start
+      .replace(/\s(And|Or|Of|In|On|At|A|An|The|For|To|With|By)\s/gi,
+        (m) => m.toLowerCase());
+  }
+
   return t || raw.trim();
 }
 

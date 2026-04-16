@@ -53,6 +53,35 @@ export interface Collection {
   bg?:      string
 }
 
+// ─── Title cleanup (mirrors ProductDetailClient — keep in sync) ───────────────
+
+const _BRAND_NOISE_API = [
+  "yoins", "zaful", "shein", "romwe", "dresslily", "rosegal",
+  "tbdress", "tidebuy", "sammydress", "floryday", "milanoo",
+]
+
+function cleanTitle(raw: string): string {
+  if (!raw?.trim()) return raw
+  let t = raw.trim()
+    .replace(/\s*[|｜/／]\s*.+$/g, "")
+    .replace(/[\s_-]*[\[\(（【][^\]\)）】]{0,40}[\]\)）】]\s*$/g, "")
+    .replace(/\s+[A-Z]{2,}[\d-]{2,}[A-Z\d-]*$/g, "")
+    .replace(/\s+CJ[A-Z0-9-]+$/gi, "")
+    .replace(/\s+#?\d{4,}$/g, "")
+    .replace(new RegExp(`\\b(${_BRAND_NOISE_API.join("|")})\\b`, "gi"), "")
+    .replace(/^(Women'?s?|Womens|Lady|Ladies|Female|Girls?)\s+/i, "")
+    .replace(/^(sexy|hot|new|fashion|casual|classic|vintage|stylish|elegant|trendy|chic|cute|beautiful|gorgeous)\s+/i, "")
+    .replace(/^[,\-–—\s]+/, "")
+    .replace(/[,\-–—\s]+$/, "")
+    .replace(/\s{2,}/g, " ")
+    .trim()
+  if (t.length > 65) {
+    const cut = t.lastIndexOf(" ", 62)
+    t = cut > 20 ? t.slice(0, cut).replace(/[,\-–—\s]+$/, "") : t.slice(0, 62)
+  }
+  return t || raw.trim()
+}
+
 // ─── Normalization helpers ────────────────────────────────────────────────────
 
 type ApiRaw = Record<string, unknown>
@@ -145,7 +174,7 @@ function normalizeProduct(raw: ApiRaw): Product {
   return {
     id:            String(raw.id ?? ""),
     slug:          String(raw.slug ?? raw.handle ?? raw.id ?? ""),
-    name:          String(raw.name ?? raw.title ?? ""),
+    name:          cleanTitle(String(raw.name ?? raw.title ?? "")),
     price,
     originalPrice,
     category,
