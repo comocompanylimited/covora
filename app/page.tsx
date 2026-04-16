@@ -24,13 +24,33 @@ export default function EntryPage() {
         justifyContent: "center",
       }}
     >
-      {/* Subtle radial gold bleed */}
+      {/* Background video */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+        style={{
+          position:       "absolute",
+          inset:          0,
+          width:          "100%",
+          height:         "100%",
+          objectFit:      "cover",
+          objectPosition: "center",
+          pointerEvents:  "none",
+        }}
+      >
+        <source src="/videos/women.mp4" type="video/mp4" />
+      </video>
+
+      {/* Cinematic overlay — deep dark scrim so glass card reads clearly */}
       <div
         aria-hidden="true"
         style={{
           position:      "absolute",
           inset:         0,
-          background:    "radial-gradient(ellipse 60% 50% at 50% 55%, rgba(201,169,110,0.055) 0%, transparent 100%)",
+          background:    "linear-gradient(to bottom, rgba(4,3,6,0.72) 0%, rgba(4,3,6,0.82) 100%)",
           pointerEvents: "none",
         }}
       />
